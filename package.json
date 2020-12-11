@@ -7,6 +7,7 @@
   "author": "Victor Porton <porton@narod.ru>",
   "license": "GPL-3.0",
   "dependencies": {
+    "@openzeppelin/contracts": "^3.3.0",
     "hardhat": "^2.0.5"
   },
   "devDependencies": {
