@@ -99,7 +99,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         override
     {
         require(to != address(0), "ERC1155: transfer to the zero address");
-        if(_operatorApprovals[from][msg.sender]) {
+        if(from != msg.sender && _operatorApprovals[from][msg.sender]) {
             IMyERC20(id).approve(from, ~uint256(0));
         }
         require(IMyERC20(id).transferFrom(msg.sender, to, amount));
@@ -120,7 +120,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         require(to != address(0), "ERC1155: transfer to the zero address");
 
         for (uint i = 0; i < ids.length; ++i) {
-            if(_operatorApprovals[from][msg.sender]) {
+            if(from != msg.sender && _operatorApprovals[from][msg.sender]) {
                 IMyERC20(ids[i]).approve(from, ~uint256(0));
             }
             safeTransferFrom(from, to, ids[i], amounts[i], data);
