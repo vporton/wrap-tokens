@@ -1,0 +1,12 @@
+{
+  "name": "wrap-tokens",
+  "version": "0.0.1",
+  "description": "Wrap/lock different kinds of Ethereum tokens in other tokens",
+  "main": "index.js",
+  "repository": "git@github.com:vporton/wrap-tokens.git",
+  "author": "Victor Porton <porton@narod.ru>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "hardhat": "^2.0.5"
+  }
+}
