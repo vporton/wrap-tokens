@@ -7,3 +7,11 @@ It provides interface between ERC20 <-> ERC1155 through both:
 * wrapped tokens (with a bug: events are not emitted)
 
 WARNING: The smart contracts in this package were not audited/tested!
+
+## Installation
+
+```sh
+yarn
+npx hardhat compile
+npx hardhat deploy --network ...
+```
