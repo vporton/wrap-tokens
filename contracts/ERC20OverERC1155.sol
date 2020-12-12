@@ -33,6 +33,7 @@ contract ERC20OverERC1155 is IERC20 {
         return erc1155.balanceOf(account, tokenId);
     }
 
+    // This contract needs first be approved for ERC-1155 tranfers.
     function transfer(address recipient, uint256 amount) public override returns (bool) {
         // solhint-disable indent
         // solhint-disable no-unused-vars
@@ -63,9 +64,13 @@ contract ERC20OverERC1155 is IERC20 {
         return true;
     }
 
+    // This contract needs first be approved for ERC-1155 tranfers.
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         // solhint-disable indent
         // solhint-disable no-unused-vars
+        if (sender != msg.sender) {
+            decreaseAllowance(msg.sender, amount);
+        }
         try erc1155.safeTransferFrom(sender, recipient, tokenId, amount, "") {
             return true;
         } catch Error(string memory /*reason*/) {

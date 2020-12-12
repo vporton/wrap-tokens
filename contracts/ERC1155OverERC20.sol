@@ -87,6 +87,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         }
     }
 
+    /// This contract needs first be approved for the ERC-20 transfers (the recommended approval sum is ~uint256(0)).
     function safeTransferFrom(
         address from,
         address to,
@@ -99,18 +100,17 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         override
     {
         require(to != address(0), "ERC1155: transfer to the zero address");
-        if(from != msg.sender && _operatorApprovals[from][msg.sender]) {
-            IMyERC20(id).approve(from, ~uint256(0));
-        }
-        require(IMyERC20(id).transfer(to, amount));
+        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: Transfer not approved");
+        require(IMyERC20(id).transferFrom(from, to, amount));
     }
 
+    /// This contract needs first be approved for the ERC-20 transfers (the recommended approval sum is ~uint256(0)).
     function safeBatchTransferFrom(
         address from,
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data
+        bytes memory /*data*/
     )
         public
         virtual
@@ -118,12 +118,11 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
     {
         require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         require(to != address(0), "ERC1155: transfer to the zero address");
+        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: Transfer not approved");
 
         for (uint i = 0; i < ids.length; ++i) {
-            if(from != msg.sender && _operatorApprovals[from][msg.sender]) {
-                IMyERC20(ids[i]).approve(from, ~uint256(0));
-            }
-            safeTransferFrom(from, to, ids[i], amounts[i], data);
+            IMyERC20(ids[i]).approve(from, ~uint256(0));
+            require(IMyERC20(ids[i]).transferFrom(from, to, amounts[i]));
         }
     }
 
