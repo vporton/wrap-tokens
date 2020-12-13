@@ -9,7 +9,6 @@ import "./IMyERC20.sol";
 
 interface IMyERC1155 is IERC1155, IERC1155Views { }
 
-// TODO: Test it.
 // This contract has a bug: It does not emit ERC-20 events.
 contract ERC20OverERC1155 is IMyERC20 {
     using SafeMath for uint256;
@@ -61,6 +60,7 @@ contract ERC20OverERC1155 is IMyERC20 {
         return true;
     }
 
+    // TODO: Test.
     // This contract needs first be approved for ERC-1155 tranfers.
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         // solhint-disable indent
