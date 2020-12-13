@@ -27,7 +27,7 @@ Well, there were two more problems:
 * You could not use the bequested tokens directly if you need them, but would need first withdraw them from the system. (You can do at any time, but that's inconvenient.)
 * You could not use the bequested tokens for a DeFi earn interest, because they are not on your wallet but on ours and you would not receive the interest.
 
-The problems were solved! Just use one of the `SmartWalletWith*` contract (You need to deploy it yourself, you can't use somebody other's smart wallet - TODO: frontend for deployment) to put your tokens on it. This contract is an _Argent wallet_ compatible wallet, so you can do with your funds in it anything you could do with a plain Ethereum wallet. For example, you can earn DeFi interest from a DeFi token put on such a wallet. Moreover, we will inherit your earned interest, too. (Don't forget to approve withdrawal of the earned tokens by our charity!) 
+The problems were solved! Just use one of the `SmartWalletWith*` contracts (You need to deploy it yourself, you can't use somebody other's smart wallet - TODO: frontend for deployment) to put your tokens on it. This contract is an _Argent wallet_ compatible wallet, so you can do with your funds in it anything you could do with a plain Ethereum wallet. For example, you can earn DeFi interest from a DeFi token put on such a wallet. Moreover, we will inherit your earned interest, too. (Don't forget to approve withdrawal of the earned tokens by our charity!) 
 
 Moreover, unlike the Argent wallet, all our `SmartWalletWith*` contracts are fully ERC-1155 compatible.
 
