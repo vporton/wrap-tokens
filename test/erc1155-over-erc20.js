@@ -21,7 +21,6 @@ const expectThrowsAsync = async (method, errorMessage) => {
 }
 
 describe("ERC1155OverERC20", function() {
-  // FIXME: Move beforeEach.
   beforeEach(async function() {
     [this.deployer, this.user1, this.user2, this.user3] = await ethers.getSigners();
 
