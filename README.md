@@ -8,7 +8,7 @@ Features:
 * Wrap/lock different kinds of Ethereum tokens in other tokens.
 * Provide smart wallets for DeFi.
 
-It provides interface between ERC20 <-> ERC1155 through both:
+It provides interface between ERC20 <-> ERC1155 through both (for your choice):
 
 * locked tokens
 * wrapped tokens (with a bug: events are not emitted)
