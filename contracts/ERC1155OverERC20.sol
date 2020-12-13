@@ -117,7 +117,6 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         }
     }
 
-    // TODO: Test.
     function isApprovedForAll(address account, address operator) external view override returns (bool) {
         return _operatorApprovals[account][operator];
     }

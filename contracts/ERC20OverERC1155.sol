@@ -60,7 +60,6 @@ contract ERC20OverERC1155 is IMyERC20 {
         return true;
     }
 
-    // TODO: Test.
     // This contract needs first be approved for ERC-1155 tranfers.
     function transferFrom(address sender, address recipient, uint256 amount) public override returns (bool) {
         // solhint-disable indent

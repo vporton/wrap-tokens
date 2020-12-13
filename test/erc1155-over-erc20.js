@@ -61,7 +61,9 @@ describe("ERC1155OverERC20", function() {
       }
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: caller is not owner nor approved");
     }
+    expect(await this.wrapper.connect(this.user1).isApprovedForAll(this.user1.address, this.user3.address)).to.be.equal(false);
     await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
+    expect(await this.wrapper.connect(this.user1).isApprovedForAll(this.user1.address, this.user3.address)).to.be.equal(true);
     await this.wrapper.connect(this.user3).safeTransferFrom(this.user1.address, this.user2.address, this.erc20Mock.address, parseEther("100"), []);
     expect(await this.erc20Mock.balanceOf(this.user1.address)).to.equal(parseEther("600"));
     expect(await this.wrapper.balanceOf(this.user1.address, this.erc20Mock.address)).to.equal(parseEther("600"));
