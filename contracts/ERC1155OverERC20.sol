@@ -6,7 +6,6 @@ import "./ERC1155.sol";
 import "./IERC1155Views.sol";
 import "./IMyERC20.sol";
 
-// TODO: Test it.
 // This contract has a bug: It does not emit ERC-1155 events.
 contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
     // using SafeMath for uint256;
@@ -118,6 +117,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         }
     }
 
+    // TODO: Test.
     function isApprovedForAll(address account, address operator) external view override returns (bool) {
         return _operatorApprovals[account][operator];
     }
