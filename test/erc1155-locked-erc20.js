@@ -15,7 +15,7 @@ describe("ERC20LockedERC1155", function() {
     const wrapper = await erc1155LockedERC20.deploy("https://example.com");
     await wrapper.deployed();
 
-    await erc20Mock.connect(user1).approve(wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
+    await erc20Mock.conn  ect(user1).approve(wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
     // TODO: Check for two different users.
     wrapper.connect(user1).borrowERC20(erc20Mock.address, parseEther("1000"), user1.address, user1.address, []);
     expect(await erc20Mock.balanceOf(user1.address)).to.equal(parseEther("0"));
