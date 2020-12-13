@@ -10,7 +10,13 @@
     "@openzeppelin/contracts": "^3.3.0",
     "hardhat": "^2.0.5",
     "hardhat-deploy": "^0.7.0-beta.38",
-    "argent-contracts": "git+ssh://git@github.com/argentlabs/argent-contracts.git#bad61b6f"
+    "argent-contracts": "git+ssh://git@github.com/argentlabs/argent-contracts.git#bad61b6f",
+    "@symfoni/hardhat-react": "^0.1.6",
+    "hardhat-deploy-ethers": "^0.3.0-beta.7",
+    "hardhat-typechain": "^0.3.3",
+    "ts-morph": "^9.0.0",
+    "typechain": "^4.0.0",
+    "typechain-target-ethers-v5": "^1.2.2"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
