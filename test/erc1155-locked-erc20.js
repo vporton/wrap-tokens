@@ -58,5 +58,7 @@ describe("ERC20LockedERC1155", function() {
 
     wrapper.connect(user1).returnToERC20(erc20Mock.address, parseEther("600"), user3.address);
     expect(await erc20Mock.balanceOf(user3.address)).to.equal(parseEther("600"));
+
+    // TODO: Check batch transfers.
   });
 });
