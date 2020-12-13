@@ -1,4 +1,8 @@
 # wrap-tokens
+TD;DR: You use this system either for (or for both):
+* wrap any ERC1155 in ERC20 or vice versa
+* bequest your funds for science and free software (please do!)
+
 Features:
 
 * Wrap/lock different kinds of Ethereum tokens in other tokens.
