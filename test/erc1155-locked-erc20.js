@@ -110,4 +110,11 @@ describe("ERC1155LockedERC20", function() {
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: ids and amounts length mismatch");
     }
   });
+
+  it("metadata", async function() {
+    expect(await this.wrapper.name(this.erc20Mock.address)).to.equal("Test coin");
+    expect(await this.wrapper.symbol(this.erc20Mock.address)).to.equal("MCK");
+    expect(await this.wrapper.decimals(this.erc20Mock.address)).to.equal(18);
+    expect(await this.wrapper.uri(this.erc20Mock.address)).to.equal("https://example.com");
+  });
 });

@@ -6,10 +6,11 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "./IERC1155Views.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol";
 import "./ERC20NoSymbol.sol";
+import "./IMyERC20.sol";
 
 interface IMyERC1155 is IERC1155, IERC1155Views { }
 
-contract ERC20LockedERC1155 is ERC20, ERC1155Receiver {
+contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     IMyERC1155 public erc1155;
     uint256 public tokenId;
 
@@ -34,12 +35,20 @@ contract ERC20LockedERC1155 is ERC20, ERC1155Receiver {
         _burn(msg.sender, _amount);
     }
 
-    function name() public view returns (string memory) {
+    function name() public view override returns (string memory) {
         return erc1155.name(tokenId);
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() public view override returns (string memory) {
         return erc1155.symbol(tokenId);
+    }
+
+    function uri() public view override returns (string memory) {
+        return erc1155.uri(tokenId);
+    }
+
+    function decimals() public view override(ERC20NoSymbol, IMyERC20) returns (uint8) {
+        return erc1155.decimals(tokenId);
     }
 
     function onERC1155Received(

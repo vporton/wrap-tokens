@@ -103,4 +103,11 @@ describe("ERC1155OverERC20", function() {
     expect(await this.erc20Mock2.balanceOf(this.user2.address)).to.equal(parseEther("1400"));
     expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [this.erc20Mock.address, this.erc20Mock2.address])).to.deep.equal([parseEther("400"), parseEther("1400")]);
   });
+
+  it("metadata", async function() {
+    expect(await this.wrapper.name(this.erc20Mock.address)).to.equal("Test coin");
+    expect(await this.wrapper.symbol(this.erc20Mock.address)).to.equal("MCK");
+    expect(await this.wrapper.decimals(this.erc20Mock.address)).to.equal(18);
+    expect(await this.wrapper.uri(this.erc20Mock.address)).to.equal("https://example.com");
+  });
 });

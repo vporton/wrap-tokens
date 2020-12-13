@@ -4,15 +4,7 @@ pragma solidity ^0.7.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
 import "./IERC1155Views.sol";
-// import "@openzeppelin/contracts/math/SafeMath.sol";
-
-// TODO: Duplicate code
-interface IMyERC20 is IERC20 {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    function decimals() external view returns (uint8);
-    function uri() external view returns (string memory);
-}
+import "./IMyERC20.sol";
 
 // TODO: Test it.
 // This contract has a bug: It does not emit ERC-1155 events.

@@ -56,5 +56,12 @@ describe("ERC20OverERC1155", function() {
       // TODO: The error message is different here.
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC20: decreased allowance below zero");
     }
+
+    it("metadata", async function() {
+      expect(await this.wrapper.name()).to.equal("Test coin");
+      expect(await this.wrapper.symbol()).to.equal("MCK");
+      expect(await this.wrapper.decimals()).to.equal(18);
+      expect(await this.wrapper.uri()).to.equal();
+    });
   });
 });

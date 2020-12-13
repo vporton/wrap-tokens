@@ -5,12 +5,13 @@ import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "./IERC1155Views.sol";
 import "./ERC20NoSymbol.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "./IMyERC20.sol";
 
 interface IMyERC1155 is IERC1155, IERC1155Views { }
 
 // TODO: Test it.
 // This contract has a bug: It does not emit ERC-20 events.
-contract ERC20OverERC1155 is IERC20 {
+contract ERC20OverERC1155 is IMyERC20 {
     using SafeMath for uint256;
 
     IMyERC1155 public erc1155;
@@ -24,10 +25,6 @@ contract ERC20OverERC1155 is IERC20 {
         tokenId = _tokenId;
     }
     // solhint-enable func-visibility
-
-    function totalSupply() public override view returns (uint256) {
-        return erc1155.totalSupply(tokenId);
-    }
 
     function balanceOf(address account) public override view returns (uint256) {
         return erc1155.balanceOf(account, tokenId);
@@ -80,12 +77,24 @@ contract ERC20OverERC1155 is IERC20 {
         // solhint-enable indent
     }
 
-    function name() public view returns(string memory) {
+    function name() public view override returns(string memory) {
         return erc1155.name(tokenId);
     }
 
-    function symbol() public view returns(string memory) {
+    function symbol() public view override returns(string memory) {
         return erc1155.symbol(tokenId);
+    }
+
+    function uri() public view override returns(string memory) {
+        return erc1155.uri(tokenId);
+    }
+
+    function decimals() public view override returns(uint8) {
+        return erc1155.decimals(tokenId);
+    }
+
+    function totalSupply() public view override returns (uint256) {
+        return erc1155.totalSupply(tokenId);
     }
 
     function _approve(address owner, address spender, uint256 amount) internal virtual returns (bool) {

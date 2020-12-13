@@ -4,14 +4,7 @@ pragma solidity ^0.7.1;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
 import "./IERC1155Views.sol";
-
-// TODO: Duplicate code
-interface IMyERC20 is IERC20 {
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    function decimals() external view returns (uint8);
-    function uri() external view returns (string memory);
-}
+import "./IMyERC20.sol";
 
 contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     // solhint-disable func-visibility
@@ -29,10 +22,6 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
         _burn(msg.sender, uint256(address(erc20)), _amount);
     }
 
-    function totalSupply(uint256 _id) external view override returns (uint256) {
-        return IMyERC20(address(_id)).totalSupply();
-    }
-
     function name(uint256 _id) external view override returns (string memory) {
         return IMyERC20(address(_id)).name();
     }
@@ -43,6 +32,10 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
 
     function decimals(uint256 _id) external view override returns (uint8) {
         return IMyERC20(address(_id)).decimals();
+    }
+
+    function totalSupply(uint256 _id) public view override returns (uint256) {
+        return IMyERC20(address(_id)).totalSupply();
     }
 
     function uri(uint256 /*_id*/) external view override(ERC1155, IERC1155Views) returns (string memory) {
