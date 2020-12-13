@@ -70,7 +70,6 @@ describe("ERC1155LockedERC20", function() {
     expect(await this.erc20Mock.balanceOf(this.user3.address)).to.equal(parseEther("600"));
   });
 
-  // TODO: Check length mismatch in batch transfers.
   it("ERC20 locked in ERC155 (batch transfers)", async function() {
     await this.wrapper.connect(this.user1).safeBatchTransferFrom(this.user1.address, this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address], [parseEther("300"), parseEther("300")], []);
     // TODO: Heterogeneous arrays of users.

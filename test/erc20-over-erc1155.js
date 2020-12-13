@@ -57,6 +57,4 @@ describe("ERC20OverERC1155", function() {
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC20: decreased allowance below zero");
     }
   });
-
-  // TODO: Check that can't transfer for other users without their approval.
 });
