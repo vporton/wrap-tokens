@@ -53,8 +53,7 @@ describe("ERC20OverERC1155", function() {
       async function fails() {
         await self.wrapper.connect(self.user2).transferFrom(self.user3.address, self.user2.address, parseEther("10"));
       }
-      // TODO: The error message is different here.
-      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC20: decreased allowance below zero");
+      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC20: transfer amount exceeds allowance");
     }
 
     it("metadata", async function() {
