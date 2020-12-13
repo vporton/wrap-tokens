@@ -34,6 +34,10 @@ module.exports = {
           privateKey: '0xdfe891177936f97142e0b8c6eefb7042d051536984a2bf2c46def1f01d37bf87', // 0x5530B1eC2bCD7B2fbDF780Ab5e7A4dE40541F3A8
           balance: '0xf0000000000000000',
         },
+        {
+          privateKey: '0xc37ae67042d02207a663c52522dc805089c3effb4aaf8e70195782e18b7c919a', // 0x2E8a38DA64876002DFF88B0f2855f7eE6A2B0aaD
+          balance: '0xf0000000000000000',
+        },
       ]
     },
   },

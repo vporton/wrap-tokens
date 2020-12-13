@@ -21,6 +21,7 @@ contract ERC20LockedERC1155 is ERC20, ERC1155Receiver {
     }
     // solhint-enable func-visibility
 
+    /// Before calling this need to approve the ERC-1155 contract.
     function borrowERC1155(uint256 _amount, address _from, address _to) public {
         bytes memory _data = ""; // efficient?
         erc1155.safeTransferFrom(_from, address(this), tokenId, _amount, _data);
