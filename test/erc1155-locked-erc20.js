@@ -5,6 +5,7 @@ const { parseEther } = ethers.utils;
 
 chai.use(require('chai-as-promised'))
 
+// TODO: Duplicate code.
 const expectThrowsAsync = async (method, errorMessage) => {
   let error = null
   try {

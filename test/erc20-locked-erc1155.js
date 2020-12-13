@@ -2,6 +2,21 @@ const { expect } = require("chai");
 const { BigNumber } = ethers;
 const { parseEther } = ethers.utils;
 
+// TODO: Duplicate code.
+const expectThrowsAsync = async (method, errorMessage) => {
+  let error = null
+  try {
+    await method()
+  }
+  catch (err) {
+    error = err
+  }
+  expect(error).to.be.an('Error')
+  if (errorMessage) {
+    expect(error.message).to.equal(errorMessage)
+  }
+}
+
 describe("ERC20LockedERC1155", function() {
   const tokenId = 124;
 
@@ -12,17 +27,20 @@ describe("ERC20LockedERC1155", function() {
     this.erc1155Mock = await ERC1155Mock.deploy("https://example.com");
     await this.erc1155Mock.deployed();
     this.erc1155Mock.mint(this.user1.address, tokenId, parseEther("1000"), []);
+    this.erc1155Mock.mint(this.user3.address, tokenId, parseEther("100"), []);
     
     const ERC20OverERC1155 = await ethers.getContractFactory("ERC20LockedERC1155");
     this.wrapper = await ERC20OverERC1155.deploy(this.erc1155Mock.address, tokenId);
     await this.wrapper.deployed();
 
     await this.erc1155Mock.connect(this.user1).setApprovalForAll(this.wrapper.address, true);
+    await this.erc1155Mock.connect(this.user3).setApprovalForAll(this.wrapper.address, true);
   });
 
   it("ERC1155 locked in ERC20", async function() {
     // TODO: Check for two different users.
     this.wrapper.connect(this.user1).borrowERC1155(parseEther("1000"), this.user1.address, this.user1.address);
+    this.wrapper.connect(this.user3).borrowERC1155(parseEther("100"), this.user3.address, this.user3.address);
     expect(await this.erc1155Mock.balanceOf(this.user1.address, tokenId)).to.equal(parseEther("0"));
     expect(await this.wrapper.balanceOf(this.user1.address)).to.equal(parseEther("1000"));
 
@@ -38,7 +56,14 @@ describe("ERC20LockedERC1155", function() {
     // TODO: Check for two different users.
     this.wrapper.connect(this.user1).returnToERC1155(parseEther("600"), this.user1.address);
     expect(await this.erc1155Mock.balanceOf(this.user1.address, tokenId)).to.equal(parseEther("600"));
+    expect(await this.wrapper.balanceOf(this.user1.address)).to.equal(parseEther("0"));
 
-    // TODO: Check that can't transfer for other users without their approval.
+    const self = this;
+    {
+      async function fails() {
+        await self.wrapper.connect(self.user2).transferFrom(self.user3.address, self.user2.address, parseEther("10"));
+      }
+      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC20: transfer amount exceeds allowance");
+    }
   });
 });
