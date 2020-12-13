@@ -76,11 +76,11 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         public
         view
         override
-        returns (uint256[] memory)
+        returns (uint256[] memory batchBalances)
     {
         require(accounts.length == ids.length, "ERC1155: accounts and ids length mismatch");
 
-        uint256[] memory batchBalances = new uint256[](accounts.length);
+        batchBalances = new uint256[](accounts.length);
 
         for (uint i = 0; i < ids.length; ++i) {
             batchBalances[i] = IMyERC20(ids[i]).balanceOf(accounts[i]);

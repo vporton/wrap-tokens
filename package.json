@@ -8,6 +8,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@openzeppelin/contracts": "^3.3.0",
+    "argent-contracts": "git+ssh://git@github.com/argentlabs/argent-contracts.git#2.3.0",
     "hardhat": "^2.0.5",
     "hardhat-deploy": "^0.7.0-beta.38"
   },
