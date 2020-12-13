@@ -21,7 +21,7 @@ WARNING: The smart contracts in this package were not audited/tested!
 
 For us to be able to take your bequested funds, please don't forget to approve (TODO: explain how and create the UI) every ERC-20 token that you wrap in our ERC-1155 contracts to be spent by our charity.
 
-It is complicated by the fact that our charitable contract uses ERC-1155 tokens. No problem: We provide contracts that can "transform" ERC-20 to ERC-1155. So please use a contract from this package (or to-be-developed frontend) to put your ERC-20 tokens (and ETH) into it and donate or bequest the magically created ERC-1155 token. Just do it for the charity. You lose nothing: You won't need your tokens after 100 years, but we need it.
+It is complicated by the fact that our charitable contract uses ERC-1155 tokens. No problem: We provide contracts that can "transform" ERC-20 to ERC-1155 (TODO: UI to do it easily while donating). So please use a contract from this package (or to-be-developed frontend) to put your ERC-20 tokens (and ETH) into it and donate or bequest the magically created ERC-1155 token. Just do it for the charity. You lose nothing: You won't need your tokens after 100 years, but we need it.
 
 Well, there were two more problems:
 * You could not use the bequested tokens directly if you need them, but would need first withdraw them from the system. (You can do at any time, but that's inconvenient.)
