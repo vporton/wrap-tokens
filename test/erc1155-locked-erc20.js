@@ -30,6 +30,10 @@ describe("ERC20LockedERC1155", function() {
     expect(await wrapper.balanceOf(user1.address, erc20Mock.address)).to.equal(parseEther("600"));
     expect(await wrapper.balanceOf(user2.address, erc20Mock.address)).to.equal(parseEther("400"));
 
+    // TODO: Check for two different users.
+    wrapper.connect(user1).returnToERC20(erc20Mock.address, parseEther("600"), user1.address);
+    expect(await erc20Mock.balanceOf(user1.address)).to.equal(parseEther("600"));
+
     // TODO: Check that can't transfer for other users without their approval.
   });
 });

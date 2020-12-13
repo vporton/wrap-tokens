@@ -25,7 +25,7 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     }
 
     function returnToERC20(IMyERC20 erc20, uint256 _amount, address _to) public {
-        require(erc20.transferFrom(address(this), _to, _amount), "Cannot transfer.");
+        require(erc20.transfer(_to, _amount), "Cannot transfer.");
         _burn(_to, uint256(address(erc20)), _amount);
     }
 
