@@ -59,7 +59,7 @@ describe("ERC1155OverERC20", function() {
       async function fails() {
         await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [self.erc20Mock.address, self.erc20Mock2.address], [parseEther("100"), parseEther("100")], []);
       }
-      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: Transfer not approved");
+      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: caller is not owner nor approved");
     }
     await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
     await this.wrapper.connect(this.user3).safeTransferFrom(this.user1.address, this.user2.address, this.erc20Mock.address, parseEther("100"), []);

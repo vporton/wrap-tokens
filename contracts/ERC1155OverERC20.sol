@@ -100,7 +100,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         override
     {
         require(to != address(0), "ERC1155: transfer to the zero address");
-        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: Transfer not approved");
+        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: caller is not owner nor approved");
         require(IMyERC20(id).transferFrom(from, to, amount));
     }
 
@@ -118,7 +118,7 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
     {
         require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
         require(to != address(0), "ERC1155: transfer to the zero address");
-        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: Transfer not approved");
+        require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: caller is not owner nor approved");
 
         for (uint i = 0; i < ids.length; ++i) {
             IMyERC20(ids[i]).approve(from, ~uint256(0));

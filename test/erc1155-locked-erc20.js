@@ -81,8 +81,7 @@ describe("ERC1155LockedERC20", function() {
       async function fails() {
         await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user3.address, [self.erc20Mock.address, self.erc20Mock2.address], [parseEther("100"), parseEther("100")], []);
       }
-      // TODO: Here it's a different error message that in ERC1155OverERC20.
-      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: transfer caller is not owner nor approved");
+      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: caller is not owner nor approved");
     }
     await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
     await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user3.address, [this.erc20Mock.address, this.erc20Mock2.address], [parseEther("100"), parseEther("100")], []);
