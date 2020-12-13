@@ -37,6 +37,7 @@ describe("ERC1155OverERC20", function() {
     await this.wrapper.deployed();
 
     await this.erc20Mock.connect(this.user1).approve(this.wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
+    await this.erc20Mock2.connect(this.user1).approve(this.wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
   });
 
   it("ERC1155 over ERC20", async function() {
@@ -53,9 +54,10 @@ describe("ERC1155OverERC20", function() {
     expect(await this.erc20Mock.balanceOf(this.user2.address)).to.equal(parseEther("300"));
     expect(await this.wrapper.balanceOf(this.user2.address, this.erc20Mock.address)).to.equal(parseEther("300"));
 
+    const self = this;
     {
       async function fails() {
-        await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user2.address, this.erc20Mock.address, parseEther("100"), []);
+        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [self.erc20Mock.address, self.erc20Mock2.address], [parseEther("100"), parseEther("100")], []);
       }
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: Transfer not approved");
     }
@@ -67,7 +69,6 @@ describe("ERC1155OverERC20", function() {
     expect(await this.wrapper.balanceOf(this.user2.address, this.erc20Mock.address)).to.equal(parseEther("400"));
   });
 
-  // TODO: Check length mismatch in batch transfers.
   it("ERC1155 over ERC20 (batch transfers)", async function() {
     await this.wrapper.connect(this.user1).safeBatchTransferFrom(
       this.user1.address,
@@ -77,27 +78,30 @@ describe("ERC1155OverERC20", function() {
       []
     );
 
+    // TODO: Heterogeneous arrays in balanceOfBatch
+
     expect(await this.erc20Mock.balanceOf(this.user1.address)).to.equal(parseEther("700"));
-    expect(await this.erc20Mock2.balanceOf(this.user1.address)).to.equal(parseEther("1700"));
-    expect(await this.wrapper.balanceOfBatch(this.user1.address, [this.erc20Mock.address, this.erc20Mock2.address])).to.equal([parseEther("700"), parseEther("1700")]);
+    expect(await this.erc20Mock2.balanceOf(this.user1.address)).to.equal(parseEther("700"));
+    expect(await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [this.erc20Mock.address, this.erc20Mock2.address])).to.deep.equal([parseEther("700"), parseEther("700")]);
     expect(await this.erc20Mock.balanceOf(this.user2.address)).to.equal(parseEther("300"));
     expect(await this.erc20Mock2.balanceOf(this.user2.address)).to.equal(parseEther("1300"));
-    expect(await this.wrapper.balanceOfBatch(this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address])).to.equal([parseEther("300"), parseEther("1300")]);
+    expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [this.erc20Mock.address, this.erc20Mock2.address])).to.deep.equal([parseEther("300"), parseEther("1300")]);
 
+    const self = this;
     {
       async function fails() {
-        await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address], [parseEther("100")], []);
+        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [self.erc20Mock.address, self.erc20Mock2.address], [parseEther("100")], []);
       }
-      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: Transfer not approved");
+      await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: ids and amounts length mismatch");
     }
     await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
-    await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address], [parseEther("100")], []);
+    await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address], [parseEther("100"), parseEther("100")], []);
     expect(await this.erc20Mock.balanceOf(this.user1.address)).to.equal(parseEther("600"));
-    expect(await this.erc20Mock2.balanceOf(this.user1.address)).to.equal(parseEther("1600"));
-    expect(await this.wrapper.balanceOfBatch(this.user1.address, [this.erc20Mock.address, this.erc20Mock2.address])).to.equal([parseEther("600"), parseEther("1600")]);
+    expect(await this.erc20Mock2.balanceOf(this.user1.address)).to.equal(parseEther("600"));
+    expect(await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [this.erc20Mock.address, this.erc20Mock2.address])).to.deep.equal([parseEther("600"), parseEther("600")]);
     expect(await this.erc20Mock.balanceOf(this.user2.address)).to.equal(parseEther("400"));
     expect(await this.erc20Mock2.balanceOf(this.user2.address)).to.equal(parseEther("1400"));
-    expect(await this.wrapper.balanceOfBatch(this.user2.address, [this.erc20Mock.address, this.erc20Mock2.address])).to.equal([parseEther("400"), parseEther("1400")]);
+    expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [this.erc20Mock.address, this.erc20Mock2.address])).to.deep.equal([parseEther("400"), parseEther("1400")]);
   });
 
   // TODO: Check batch transfers.
