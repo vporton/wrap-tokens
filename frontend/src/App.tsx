@@ -1,23 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <h1>Manage Smart Crypto Funds</h1>
+        <p>ERC-20 token address: <input type="text" maxLength={42} size={50}/></p>
+        <p>ERC-1155 locker contract address: <input type="text" maxLength={78} size={92}/></p>
         <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+          Amount: <input type="number"/>
+          <input type="button" value="Swap ERC-1155 to ERC-20"/>
+          <input type="button" value="Swap ERC-20 to ERC-1155"/>
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
     </div>
   );
