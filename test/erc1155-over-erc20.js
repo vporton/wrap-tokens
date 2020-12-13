@@ -64,6 +64,35 @@ describe("ERC1155OverERC20", function() {
       expect(await this.wrapper.balanceOf(user2.address, this.erc20Mock.address)).to.equal(parseEther("400"));
     });
 
+    // TODO: Check length mismatch in batch transfers.
+    it("ERC1155 over ERC20 (batch transfers)", async function() {
+      await this.wrapper.connect(user1).safeTransferFromBatch(
+        user1.address,
+        user2.address,
+        [this.erc20Mock.address],
+        [parseEther("300")],
+        []
+      );
+
+      expect(await this.erc20Mock.balanceOf(user1.address)).to.equal(parseEther("700"));
+      expect(await this.wrapper.balanceOfBatch(user1.address, [this.erc20Mock.address])).to.equal([parseEther("700")]);
+      expect(await this.erc20Mock.balanceOf(user2.address)).to.equal(parseEther("300"));
+      expect(await this.wrapper.balanceOfBatch(user2.address, [this.erc20Mock.address])).to.equal([parseEther("300")]);
+
+      {
+        async function fails() {
+          await this.wrapper.connect(user3).safeTransferFromBatch(user1.address, user2.address, [this.erc20Mock.address], [parseEther("100")], []);
+        }
+        await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: Transfer not approved");
+      }
+      await this.wrapper.connect(user1).setApprovalForAll(user3.address, true);
+      await this.wrapper.connect(user3).safeTransferFromBatch(user1.address, user2.address, [this.erc20Mock.address], [parseEther("100")], []);
+      expect(await this.erc20Mock.balanceOf(user1.address)).to.equal(parseEther("600"));
+      expect(await this.wrapper.balanceOfBatch(user1.address, [this.erc20Mock.address])).to.equal([parseEther("600")]);
+      expect(await this.erc20Mock.balanceOf(user2.address)).to.equal(parseEther("400"));
+      expect(await this.wrapper.balanceOfBatch(user2.address, [this.erc20Mock.address])).to.equal([parseEther("400")]);
+    });
+
     // TODO: Check batch transfers.
   });
 });

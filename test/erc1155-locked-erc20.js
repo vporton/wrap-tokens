@@ -62,6 +62,28 @@ describe("ERC1155LockedERC20", function() {
       expect(await this.erc20Mock.balanceOf(user3.address)).to.equal(parseEther("600"));
     });
 
-    // TODO: Check batch transfers.
+    // TODO: Check length mismatch in batch transfers.
+    it("ERC20 locked in ERC155 (batch transfers)", async function() {
+      await this.wrapper.connect(user1).safeTransferFromBatch(user1.address, user2.address, [this.erc20Mock.address], [parseEther("300")], []);
+      expect(await this.wrapper.balanceOf(user1.address, [this.erc20Mock.address])).to.equal([parseEther("700")]);
+      expect(await this.wrapper.balanceOf(user2.address, [this.erc20Mock.address])).to.equal([parseEther("300")]);
+
+      {
+        async function fails() {
+          await this.wrapper.connect(user3).safeTransferFrom(user1.address, user2.address, [this.erc20Mock.address], [parseEther("100")], []);
+        }
+        // TODO: Here it's a different error message that in ERC1155OverERC20.
+        await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: caller is not owner nor approved");
+      }
+      await this.wrapper.connect(user1).setApprovalForAll(user3.address, true);
+      await this.wrapper.connect(user3).safeTransferFrom(user1.address, user2.address, [this.erc20Mock.address], [parseEther("100")], []);
+      expect(await this.erc20Mock.balanceOf(user1.address)).to.equal(parseEther("0"));
+      expect(await this.wrapper.balanceOfBatch(user1.address, [this.erc20Mock.address])).to.equal([parseEther("600")]);
+      expect(await this.erc20Mock.balanceOf(user2.address)).to.equal(parseEther("0"));
+      expect(await this.wrapper.balanceOfBatch(user2.address, [this.erc20Mock.address])).to.equal([parseEther("400")]);
+
+      this.wrapper.connect(user1).returnToERC20(this.erc20Mock.address, parseEther("600"), user3.address);
+      expect(await this.erc20Mock.balanceOf(user3.address)).to.equal(parseEther("600"));
+    });
   });
 });
