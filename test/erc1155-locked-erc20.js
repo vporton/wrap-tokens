@@ -19,8 +19,8 @@ const expectThrowsAsync = async (method, errorMessage) => {
   }
 }
 
-describe("ERC20LockedERC1155", function() {
-  it("ERC1155 locked in ERC20", async function() {
+describe("ERC1155LockedERC20", function() {
+  it("ERC20 locked in ERC1155", async function() {
     const [deployer, user1, user2, user3] = await ethers.getSigners();
 
     const ERC20Mock = await ethers.getContractFactory("MockCoin");
