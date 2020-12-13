@@ -15,7 +15,7 @@ describe("ERC1155OverERC20", function() {
     const wrapper = await ERC1155OverERC20.deploy("https://example.com");
     await wrapper.deployed();
 
-    await erc20Mock.connect(user1).approve(await wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
+    await erc20Mock.connect(user1).approve(wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
 
     await wrapper.connect(user1).safeTransferFrom(
       user1.address,
