@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, isValidElement } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
+const { toBN } = Web3.utils;
 
 function getCookie(cname: string): string {
   var name = cname + "=";
@@ -76,19 +77,43 @@ async function getWeb3() {
     return myWeb3 = myWeb3Provider ? new Web3(myWeb3Provider) : null;
 }
 
+function isAddressValid(v: string): boolean { // TODO: called twice
+  return Web3.utils.isAddress(v);
+}
+
+function isWrappedTokenValid(v: string): boolean { // TODO: called twice
+  return /^[0-9]+$/.test(v) && toBN(v).lt(toBN(2).pow(toBN(160)));
+}
+
+function isRealNumber(v: string): boolean { // TODO: called twice
+  return /^[0-9]+(\.[0-9]+)?$/.test(v);
+}
+
 function App() {
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
+  const [lockerContract, setLockerContract] = useState('');
   const [amount, setAmount] = useState('');
+
   function setErc20Contract(v: string) {
     _setErc20Contract(v);
-    // _setErc1155Token(bigInt(v.substring(2), 16).toString());
-    _setErc1155Token(Web3.utils.toBN(v).toString());
+    if(isAddressValid(v)) {
+      _setErc1155Token(toBN(v).toString());
+    } else {
+      _setErc1155Token("");
+    }
   }
   function setErc1155Token(v: string) {
     _setErc1155Token(v);
-    _setErc20Contract(Web3.utils.toHex(v));
+    if(isWrappedTokenValid(v)) {
+      const hex = Web3.utils.toHex(v);
+      const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
+      _setErc20Contract(Web3.utils.toChecksumAddress(addr));
+    } else {
+      _setErc20Contract("");
+    }
   }
+
   return (
     <div className="App">
       <header className="App-header">
@@ -96,8 +121,8 @@ function App() {
         <p>ERC-20 token address:
           <Address value={erc20Contract} onChange={(e: Event) => setErc20Contract((e.target as HTMLInputElement).value as string)}/></p>
         <p>ERC-1155 token ID:
-          <Uint256 value={erc1155Token} onChange={(e: Event) => setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
-        <p>ERC-1155 locker contract address: <Uint256/></p>
+          <WrappedERC20 value={erc1155Token} onChange={(e: Event) => setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
+        <p>ERC-1155 locker contract address: <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
         <p>
           Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           <input type="button" value="Swap ERC-1155 to ERC-20"/>
@@ -111,15 +136,25 @@ function App() {
 function Address({...props}) {
   return (
     <span className="Address">
-      <input type="text" maxLength={42} size={50} value={props.value ? props.value : ""} onChange={props.onChange}/>
+      <input type="text"
+             maxLength={42}
+             size={50}
+             value={props.value ? props.value : ""}
+             onChange={props.onChange}
+             className={isAddressValid(props.value) ? '' : 'error'}/>
     </span>
   )
 }
 
-function Uint256({...props}) {
+function WrappedERC20({...props}) { // FIXME: rename
   return (
-    <span className="Uint256">
-      <input type="text" maxLength={78} size={92} value={props.value ? props.value : ""} onChange={props.onChange}/>
+    <span className="WrappedERC20">
+      <input type="text"
+             maxLength={49}
+             size={56}
+             value={props.value}
+             onChange={props.onChange}
+             className={isWrappedTokenValid(props.value) ? '' : 'error'}/>
     </span>
   )
 }
@@ -127,7 +162,10 @@ function Uint256({...props}) {
 function Amount({...props}  ) {
   return (
     <span className="Amount">
-      <input type="text" value={props.value ? props.value : ""} onChange={props.onChange}/>
+      <input type="text"
+             value={props.value ? props.value : ""}
+             onChange={props.onChange}
+             className={isRealNumber(props.value) ? '' : 'error'}/>
     </span>
   )
 }
