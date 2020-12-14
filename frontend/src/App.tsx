@@ -228,6 +228,10 @@ function App() {
     await loadLockedIn1155(v, erc1155Token);
   }
 
+  async function lockErc20inErc1155() {
+    // await 
+  }
+
   return (
     <div className="App">
       <header className="App-header">
