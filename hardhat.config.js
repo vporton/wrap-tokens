@@ -54,6 +54,14 @@ module.exports = {
         '0x646f1ce2fdad0e6deeeb5c7e8e5543bdde65e86029e2fd9fc169899c440a7913', // 0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d
       ]
     },
+    bsc: {
+      url: "https://bsc-dataseed4.ninicoin.io:443",
+      accounts: process.env.MAINNET_PRIVATE_KEY ? [ process.env.MAINNET_PRIVATE_KEY ] : [],
+    },
+    bsctest: {
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      accounts: process.env.TESTNET_PRIVATE_KEY ? [ process.env.TESTNET_PRIVATE_KEY ] : [],
+    }
   },
   namedAccounts: {
     deployer: {

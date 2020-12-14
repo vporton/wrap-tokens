@@ -24,6 +24,8 @@ const CHAINS: { [id: string] : string } = {
   '77': 'sokol',
   '100': 'xdai',
   '74': 'idchain',
+  '56': 'bsc',
+  '97': 'bsctest',
 }
 
 let _web3Provider: any = null;
