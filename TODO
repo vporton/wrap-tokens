@@ -2,3 +2,4 @@
 * ERC1155LockedERC721
 * ERC1155OverERC721
 * also wrap ETH
+* hook to `yarn export` after `hardhat compile`.
