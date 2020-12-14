@@ -119,13 +119,19 @@ function App() {
       <header className="App-header">
         <h1>Manage Smart Crypto Funds</h1>
         <p>ERC-20 token address:
+          {' '}
           <Address value={erc20Contract} onChange={(e: Event) => setErc20Contract((e.target as HTMLInputElement).value as string)}/></p>
         <p>ERC-1155 token ID:
+        {' '}
           <WrappedERC20 value={erc1155Token} onChange={(e: Event) => setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
-        <p>ERC-1155 locker contract address: <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
+        <p>ERC-1155 locker contract address:
+        {' '}
+          <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
         <p>
           Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
+          {' '}
           <input type="button" value="Swap ERC-1155 to ERC-20"/>
+          {' '}
           <input type="button" value="Swap ERC-20 to ERC-1155"/>
         </p>
       </header>
@@ -165,7 +171,7 @@ function Amount({...props}  ) {
       <input type="text"
              value={props.value ? props.value : ""}
              onChange={props.onChange}
-             className={isRealNumber(props.value) ? '' : 'error'}/>
+               className={isRealNumber(props.value) ? '' : 'error'}/>
     </span>
   )
 }
