@@ -6,6 +6,22 @@ const { toBN, fromWei, toWei } = Web3.utils;
 
 let myWeb3: any = null;
 
+let abisPromise: any = null;
+let abis: object | null = null;
+
+async function getABIs() {
+  if (abis) {
+    return await abis;
+  }
+  if (!abisPromise) {
+    abisPromise = await window.fetch(`/abis.json`);
+  }
+  if (abis) {
+    return abis;
+  }
+  return abis = await abisPromise.json();
+}
+
 // TODO
 const CHAINS: { [id: string] : string } = {
   '1': 'mainnet',
@@ -108,6 +124,7 @@ function App() {
 
   async function loadErc20(_erc20Contract: string) {
     // TODO: Don't call functions repeatedly.
+    // TODO: Move inside
     const abi = [
       {
         "constant": true,
@@ -176,33 +193,8 @@ function App() {
 
   async function loadLockedIn1155(_lockerContract: string, _erc1155Token: string) {
     // TODO: Don't call functions repeatedly.
-    const abi = [
-      {
-        "constant": true,
-        "inputs": [
-          {
-              "name": "user",
-              "type": "address"
-          },
-          {
-            "name": "token",
-            "type": "uint256"
-          }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "name": "balance",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-    ];
-  
     if (_lockerContract !== '') {
+      const abi = (await getABIs()).ERC1155LockedERC20;
       const web3 = await getWeb3();
       if (web3 !== null) {
         const erc1155 = new web3.eth.Contract(abi as any, _lockerContract);
