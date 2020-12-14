@@ -81,7 +81,6 @@ function App() {
     if(myWeb3) return myWeb3;
   
     _web3Provider = await getWeb3Provider();
-    console.log('_web3Provider', _web3Provider)
     return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
   }
   
