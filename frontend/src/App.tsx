@@ -2,7 +2,6 @@ import React, { useState, isValidElement } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
-import { Contract } from 'ethers';
 const { toBN, fromWei, toWei } = Web3.utils;
 
 function getCookie(cname: string): string {
@@ -92,7 +91,7 @@ function isRealNumber(v: string): boolean { // TODO: called twice
 function App() {
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
-  const [lockerContract, setLockerContract] = useState('');
+  const [lockerContract, _setLockerContract] = useState('');
   const [erc20Amount, setErc20Amount] = useState('');
   const [erc20Symbol, setErc20Symbol] = useState('');
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
@@ -114,6 +113,7 @@ function App() {
       const hex = Web3.utils.toHex(v);
       const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
       _setErc20Contract(Web3.utils.toChecksumAddress(addr));
+      loadLockedIn1155();
     } else {
       _setErc20Contract("");
     }
@@ -175,6 +175,51 @@ function App() {
       .catch(() => {
         setErc20Symbol("");
       });
+  }
+
+  async function loadLockedIn1155() {
+    // TODO: Don't call functions repeatedly.
+    const abi = [
+      {
+        "constant": true,
+        "inputs": [
+          {
+              "name": "user",
+              "type": "address"
+          },
+          {
+            "name": "token",
+            "type": "uint256"
+          }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "balance",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+    ];
+    const web3 = await getWeb3();
+    const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+    const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+
+    erc1155.methods.balanceOf(account, erc1155Token).call()
+      .then((balance: string) => {
+        setLockedErc1155Amount(balance);
+      })
+      .catch(() => {
+        setLockedErc1155Amount("");
+      });
+  }
+
+  function setLockerContract(v: string) {
+    _setLockerContract(v);
+    loadLockedIn1155();
   }
 
   return (
