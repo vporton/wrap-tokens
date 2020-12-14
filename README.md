@@ -61,3 +61,21 @@ yarn
 npx hardhat compile
 npx hardhat deploy --network ...
 ```
+
+## Contract addresses
+
+### Binance Smart Chain
+
+**ERC1155LockedERC20** `0x23AdBf93Cb8D21bc9E9a0bAd75eE8326d5C04D86`
+
+**ERC1155OverERC20** `0x0D3e93CeeB31760EbB38e18DA61ECA10a948BA9f`
+
+### Binance Smart Chain Testnet
+
+**ERC1155LockedERC20** `0xBab0Fb354c9100EE7D549B0Db5E0697dE45947BC`
+
+**ERC1155OverERC20** `0x54a24917f410505d70E328b5399e42E8a935F48f`
+
+### Mainnet
+
+TODO
