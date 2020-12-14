@@ -16,3 +16,12 @@ code {
   background: red;
   color: white;
 }
+
+.deployButtons {
+  font-size: 0.9ex;
+}
+
+.deployButtons a:link, .deployButtons a:visited {
+  color: yellow;
+  text-decoration: none;
+}
