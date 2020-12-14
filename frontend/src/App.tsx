@@ -212,6 +212,7 @@ function App() {
       if (web3 !== null) {
         const erc20 = new web3.eth.Contract(abi as any, _erc20Contract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+        console.log(`${_erc20Contract} | ${account}`);
       
         erc20.methods.balanceOf(account).call()
           .then((balance: string) => {
@@ -286,7 +287,7 @@ function App() {
       if (web3 !== null) {
         const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        await mySend(erc1155, erc1155.methods.borrowERC20, [amount, account, account, []], null, null);
+        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, amount, account, account, []], null, null);
       }
     }
   }
