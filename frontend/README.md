@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend app of the Wrapped Tokens project. It is done in pure HTML + JavaScript
+and can be deployed on any server.
 
 ## Available Scripts
 

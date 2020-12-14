@@ -14,7 +14,7 @@ It provides interface between ERC20 <-> ERC1155 through both (for your choice):
 * locked tokens
 * wrapped tokens (with a bug: events are not emitted)
 
-WARNING: The smart contracts in this package were not audited/tested!
+See also `frontend/README.md`.
 
 ## The smart wallet usage
 
