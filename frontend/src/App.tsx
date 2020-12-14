@@ -296,9 +296,11 @@ function App() {
         const halfBig = toBN(2).pow(toBN(128));
         if(allowance.lt(halfBig)) {
           const big = toBN(2).pow(toBN(256)).sub(toBN(1));
-          await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null);
+          await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
+            .catch(alert);
         }
-        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null);
+        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
+          .catch(alert);
       }
     }
   }
@@ -310,7 +312,8 @@ function App() {
       if (web3 !== null) {
         const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null);
+        await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null)
+          .catch(alert);
       }
     }
   }
@@ -343,9 +346,11 @@ function App() {
           {' '}
           <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
-          <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}/>
+          <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}
+                 disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
           {' '}
-          <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}/>
+          <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}
+                 disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
         </p>
         <p>Locking/unlocking is 1/1 swap.</p>
       </header>
