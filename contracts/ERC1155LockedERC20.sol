@@ -12,14 +12,16 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     }
     // solhint-enable func-visibility
 
-    function borrowERC20(IMyERC20 erc20, uint256 _amount, address _from, address _to, bytes calldata data) public {
+    function borrowERC20(IMyERC20 erc20, uint256 _amount, address _from, address _to, bytes calldata _data) public {
         require(erc20.transferFrom(_from, address(this), _amount), "Cannot transfer.");
-        _mint(_to, uint256(address(erc20)), _amount, data);
+        _mint(_to, uint256(address(erc20)), _amount, _data);
+        emit BorrowedERC20(erc20, msg.sender, _amount, _from, _to, _data);
     }
 
     function returnToERC20(IMyERC20 erc20, uint256 _amount, address _to) public {
         require(erc20.transfer(_to, _amount), "Cannot transfer.");
         _burn(msg.sender, uint256(address(erc20)), _amount);
+        emit ReturnedToERC20(erc20, _amount, msg.sender, _to);
     }
 
     function name(uint256 _id) external view override returns (string memory) {
@@ -41,4 +43,8 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     function uri(uint256 /*_id*/) external view override(ERC1155, IERC1155Views) returns (string memory) {
         return _uri;
     }
+
+    event BorrowedERC20(IMyERC20 erc20, address sender, uint256 amount, address from, address to, bytes data);
+
+    event ReturnedToERC20(IMyERC20 erc20, uint256 amount, address from, address to);
 }

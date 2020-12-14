@@ -39,8 +39,8 @@ describe("ERC20LockedERC1155", function() {
 
   it("ERC1155 locked in ERC20", async function() {
     // TODO: Check for two different users.
-    this.wrapper.connect(this.user1).borrowERC1155(parseEther("1000"), this.user1.address, this.user1.address);
-    this.wrapper.connect(this.user3).borrowERC1155(parseEther("100"), this.user3.address, this.user3.address);
+    this.wrapper.connect(this.user1).borrowERC1155(parseEther("1000"), this.user1.address, this.user1.address, []);
+    this.wrapper.connect(this.user3).borrowERC1155(parseEther("100"), this.user3.address, this.user3.address, []);
     expect(await this.erc1155Mock.balanceOf(this.user1.address, tokenId)).to.equal(parseEther("0"));
     expect(await this.wrapper.balanceOf(this.user1.address)).to.equal(parseEther("1000"));
 
@@ -54,13 +54,13 @@ describe("ERC20LockedERC1155", function() {
     expect(await this.wrapper.balanceOf(this.user2.address)).to.equal(parseEther("400"));
 
     // TODO: Check for two different users.
-    this.wrapper.connect(this.user1).returnToERC1155(parseEther("600"), this.user1.address);
+    this.wrapper.connect(this.user1).returnToERC1155(parseEther("600"), this.user1.address, []);
     expect(await this.erc1155Mock.balanceOf(this.user1.address, tokenId)).to.equal(parseEther("600"));
     expect(await this.wrapper.balanceOf(this.user1.address)).to.equal(parseEther("0"));
   });
 
   it("increase/decrease allowance", async function() {
-    this.wrapper.connect(this.user1).borrowERC1155(parseEther("1000"), this.user1.address, this.user1.address);
+    this.wrapper.connect(this.user1).borrowERC1155(parseEther("1000"), this.user1.address, this.user1.address, []);
 
     await this.wrapper.connect(this.user1).approve(this.user3.address, parseEther("300"));
     const self = this;

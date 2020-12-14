@@ -23,16 +23,16 @@ contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     // solhint-enable func-visibility
 
     /// Before calling this need to approve the ERC-1155 contract.
-    function borrowERC1155(uint256 _amount, address _from, address _to) public {
-        bytes memory _data = ""; // efficient?
+    function borrowERC1155(uint256 _amount, address _from, address _to, bytes calldata _data) public {
         erc1155.safeTransferFrom(_from, address(this), tokenId, _amount, _data);
         _mint(_to, _amount);
+        emit BorrowedERC1155(msg.sender, _amount, _from, _to, _data);
     }
 
-    function returnToERC1155(uint256 _amount, address _to) public {
-        bytes memory _data = ""; // efficient?
+    function returnToERC1155(uint256 _amount, address _to, bytes calldata _data) public {
         erc1155.safeTransferFrom(address(this), _to, tokenId, _amount, _data);
         _burn(msg.sender, _amount);
+        emit ReturnedToERC1155(_amount, msg.sender, _to, _data);
     }
 
     function name() public view override returns (string memory) {
@@ -70,4 +70,8 @@ contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     {
         return bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"));
     }
+
+    event BorrowedERC1155(address sender, uint256 amount, address from, address to, bytes data);
+
+    event ReturnedToERC1155(uint256 amount, address from, address to, bytes data);
 }
