@@ -136,9 +136,9 @@ function App() {
         <p>
           Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
-          <input type="button" value="Swap ERC-1155 to ERC-20"/>
+          <input type="button" value="Lock ERC-20 in ERC-1155"/>
           {' '}
-          <input type="button" value="Swap ERC-20 to ERC-1155"/>
+          <input type="button" value="Unlock ERC-1155 to ERC-20"/>
         </p>
         <p>Locking/unlocking is 1/1 swap.</p>
       </header>
