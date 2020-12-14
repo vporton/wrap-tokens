@@ -128,9 +128,11 @@ function App() {
           <WrappedERC20 value={erc1155Token} onChange={(e: Event) => setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
         <p>ERC-1155 locker contract address:
           {' '}
-          <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
-          <p>Amount on ERC-20: <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span></p>
-          <p>Amount locked in ERC-1155: <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
+          <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
+          <br/>
+          <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
+        <p>Amount on ERC-20: <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span></p>
+        <p>Amount locked in ERC-1155: <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
         <p>
           Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
