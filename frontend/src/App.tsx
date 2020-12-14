@@ -124,10 +124,10 @@ function App() {
           {' '}
           <Address value={erc20Contract} onChange={(e: Event) => setErc20Contract((e.target as HTMLInputElement).value as string)}/></p>
         <p>ERC-1155 token ID:
-        {' '}
+          {' '}
           <WrappedERC20 value={erc1155Token} onChange={(e: Event) => setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
         <p>ERC-1155 locker contract address:
-        {' '}
+          {' '}
           <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
           <p>Amount on ERC-20: <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span></p>
           <p>Amount locked in ERC-1155: <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
@@ -138,6 +138,7 @@ function App() {
           {' '}
           <input type="button" value="Swap ERC-20 to ERC-1155"/>
         </p>
+        <p>Locking/unlocking is 1/1 swap.</p>
       </header>
     </div>
   );
