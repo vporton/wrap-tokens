@@ -89,6 +89,9 @@ function App() {
   
   async function getChainId(): Promise<any> { // TODO: more specific type
     const web3 = await getWeb3();
+    if (!web3) {
+      return null;
+    }
     return await web3.eth.getChainId();
   }
 
@@ -137,10 +140,11 @@ function App() {
     sendArgs = sendArgs || {}
     const web3 = await getWeb3();
     const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+    console.log(account)
     return method.bind(contract)(...args).estimateGas({gas: '1000000', from: account, ...sendArgs}).
         then((estimatedGas: string) => {
             const gas = String(Math.floor(Number(estimatedGas) * 1.15) + 24000);
-            if(handler !== undefined)
+            if(handler !== null)
                 return method.bind(contract)(...args).send({gas, from: account, ...sendArgs}, handler);
             else
                 return method.bind(contract)(...args).send({gas, from: account, ...sendArgs});
@@ -212,7 +216,6 @@ function App() {
       if (web3 !== null) {
         const erc20 = new web3.eth.Contract(abi as any, _erc20Contract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
-        console.log(`${_erc20Contract} | ${account}`);
       
         erc20.methods.balanceOf(account).call()
           .then((balance: string) => {
@@ -281,13 +284,33 @@ function App() {
   });
 
   async function lockErc20inErc1155() {
-    if (lockerContract !== '') {
+    if (lockerContract !== '' && erc20Contract != '') {
+      const abi = (await getABIs()).ERC1155LockedERC20;
+      const abi2 = await fetchOnceJson('/erc20-abi.json');
+      const web3 = await getWeb3();
+      if (web3 !== null) {
+        const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+        const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
+        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+        const allowance = toBN(await erc20.methods.allowance(account, lockerContract).call());
+        const halfBig = toBN(2).pow(toBN(128));
+        if(allowance.lt(halfBig)) {
+          const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+          await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null);
+        }
+        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null);
+      }
+    }
+  }
+
+  async function unlockErc20fromErc1155() {
+    if (lockerContract !== '' && erc20Contract != '') {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const web3 = await getWeb3();
       if (web3 !== null) {
         const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, amount, account, account, []], null, null);
+        await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null);
       }
     }
   }
@@ -322,7 +345,7 @@ function App() {
           {' '}
           <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}/>
           {' '}
-          <input type="button" value="Unlock ERC-1155 to ERC-20"/>
+          <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}/>
         </p>
         <p>Locking/unlocking is 1/1 swap.</p>
       </header>
