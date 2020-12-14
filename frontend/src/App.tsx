@@ -2,7 +2,7 @@ import React, { useState, isValidElement } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
-const { toBN } = Web3.utils;
+const { toBN, fromWei, toWei } = Web3.utils;
 
 function getCookie(cname: string): string {
   var name = cname + "=";
@@ -93,6 +93,8 @@ function App() {
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
   const [lockerContract, setLockerContract] = useState('');
+  const [erc20Amount, setErc20Amount] = useState('');
+  const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
   const [amount, setAmount] = useState('');
 
   function setErc20Contract(v: string) {
@@ -127,6 +129,8 @@ function App() {
         <p>ERC-1155 locker contract address:
         {' '}
           <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/></p>
+          <p>Amount on ERC-20: <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span></p>
+          <p>Amount locked in ERC-1155: <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
         <p>
           Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
