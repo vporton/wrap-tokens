@@ -2,6 +2,7 @@ import React, { useState, isValidElement } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
+import { Contract } from 'ethers';
 const { toBN, fromWei, toWei } = Web3.utils;
 
 function getCookie(cname: string): string {
@@ -65,15 +66,14 @@ function myWeb3Modal() {
     });
 }
 
-let myWeb3Provider: any = null;
+async function getWeb3Provider() {
+  return (window as any).ethereum ? await myWeb3Modal().connect() : null;
+}
 
 async function getWeb3() {
     if(myWeb3) return myWeb3;
 
-    if((window as any).ethereum) {
-        const web3Modal = myWeb3Modal();
-        myWeb3Provider = await web3Modal.connect();
-    }
+    const myWeb3Provider = await getWeb3Provider();
     return myWeb3 = myWeb3Provider ? new Web3(myWeb3Provider) : null;
 }
 
@@ -94,6 +94,7 @@ function App() {
   const [erc1155Token, _setErc1155Token] = useState('');
   const [lockerContract, setLockerContract] = useState('');
   const [erc20Amount, setErc20Amount] = useState('');
+  const [erc20Symbol, setErc20Symbol] = useState('');
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
   const [amount, setAmount] = useState('');
 
@@ -101,10 +102,12 @@ function App() {
     _setErc20Contract(v);
     if(isAddressValid(v)) {
       _setErc1155Token(toBN(v).toString());
+      loadErc20(v);
     } else {
       _setErc1155Token("");
     }
   }
+
   function setErc1155Token(v: string) {
     _setErc1155Token(v);
     if(isWrappedTokenValid(v)) {
@@ -114,6 +117,64 @@ function App() {
     } else {
       _setErc20Contract("");
     }
+  }
+
+  async function loadErc20(_erc20Contract: string) {
+    // TODO: Don't call functions repeatedly.
+    const abi = [
+      {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "balance",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+    ];
+    const web3 = await getWeb3();
+    const erc20 = new web3.eth.Contract(abi as any, _erc20Contract);
+    const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+
+    erc20.methods.balanceOf(account).call()
+      .then((balance: string) => {
+        setErc20Amount(balance);
+      })
+      .catch(() => {
+        setErc20Amount("");
+      });
+
+    erc20.methods.symbol().call()
+      .then((symbol: string) => {
+        setErc20Symbol(symbol);
+      })
+      .catch(() => {
+        setErc20Symbol("");
+      });
   }
 
   return (
@@ -131,10 +192,18 @@ function App() {
           <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
           <br/>
           <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
-        <p>Amount on ERC-20: <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span></p>
-        <p>Amount locked in ERC-1155: <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
+        <p>Amount on ERC-20:
+          {' '}
+          <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span>
+          {' '}
+          <span>{erc20Symbol}</span></p>
+        <p>Amount locked in ERC-1155:
+          {' '}
+          <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
         <p>
-          Amount: <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
+          Amount:
+          {' '}
+          <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
           <input type="button" value="Lock ERC-20 in ERC-1155"/>
           {' '}
