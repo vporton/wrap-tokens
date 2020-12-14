@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import './App.css';
 import Web3 from 'web3';
 import Web3Modal from "web3modal";
-import bigInt from "big-integer";
-
 
 function getCookie(cname: string): string {
   var name = cname + "=";
@@ -84,11 +82,12 @@ function App() {
   const [amount, setAmount] = useState('');
   function setErc20Contract(v: string) {
     _setErc20Contract(v);
-    _setErc1155Token(bigInt(v.substring(2), 16).toString());
+    // _setErc1155Token(bigInt(v.substring(2), 16).toString());
+    _setErc1155Token(Web3.utils.toBN(v).toString());
   }
   function setErc1155Token(v: string) {
     _setErc1155Token(v);
-    _setErc20Contract("0x" + bigInt(v).toString(16));
+    _setErc20Contract(Web3.utils.toHex(v));
   }
   return (
     <div className="App">
