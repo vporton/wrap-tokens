@@ -4,6 +4,8 @@ import Web3 from 'web3';
 import Web3Modal from "web3modal";
 const { toBN, fromWei, toWei } = Web3.utils;
 
+// FIXME: Funny error message when rejecting a transaction in MetaMask.
+
 let myWeb3: any = null;
 
 let abisPromise: any = null;
