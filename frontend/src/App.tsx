@@ -9,19 +9,6 @@ let myWeb3: any = null;
 let abisPromise: any = null;
 let abis: object | null = null;
 
-async function getABIs() {
-  if (abis) {
-    return await abis;
-  }
-  if (!abisPromise) {
-    abisPromise = await window.fetch(`/abis.json`);
-  }
-  if (abis) {
-    return abis;
-  }
-  return abis = await abisPromise.json();
-}
-
 // TODO
 const CHAINS: { [id: string] : string } = {
   '1': 'mainnet',
@@ -29,7 +16,7 @@ const CHAINS: { [id: string] : string } = {
   '4': 'rinkeby',
   '5': 'goerli',
   '42': 'kovan',
-  '101': 'local', // FIXME
+  '1337': 'local', // FIXME
   '122': 'fuse',
   '80001': 'mumbai',
   '137': 'matic',
@@ -55,6 +42,33 @@ function isRealNumber(v: string): boolean { // TODO: called twice
 
 // TODO: Handle Ethereum network change.
 
+// let _fetchedPromises = new Map<string, Promise<any>>();
+let _fetchedJsonPromises = new Map<string, Promise<any>>();
+let _fetched = new Map<string, any>();
+
+async function fetchOnceJsonPromise(url: string): Promise<Promise<any>> {
+  let promise = _fetchedJsonPromises.get(url);
+  if (promise) {
+    return promise;
+  } else {
+    const fetchResult = await fetch(url);
+    promise = fetchResult.json() as Promise<any>;
+    _fetchedJsonPromises.set(url, promise);
+    return await promise;
+  }
+}
+
+async function fetchOnceJson(url: string): Promise<any> {
+  let json = _fetched.get(url);
+  if (json) {
+    return json;
+  } else {
+    json = await fetchOnceJsonPromise(url);
+    _fetched.set(url, json);
+    return json;
+  }
+}
+
 function App() {
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
@@ -66,7 +80,25 @@ function App() {
 
   let _web3Modal: any = null;
 
-  async function myWeb3Modal() {
+  async function getABIs() {
+    return await fetchOnceJson(`/abis.json`);
+  }
+  
+  let addressesPromise: any = null;
+  let addresses: object | null = null;
+  
+  async function getChainId(): Promise<any> { // TODO: more specific type
+    const web3 = await getWeb3();
+    return await web3.eth.getChainId();
+  }
+
+  async function getAddresses() {
+    const [json, chainId] = await Promise.all([fetchOnceJson(`/addresses.json`), getChainId()]);
+    const result = json[CHAINS[chainId]]; // FIXME: if non-existing chainId
+    return result;
+  }
+  
+    async function myWeb3Modal() {
     if (_web3Modal) {
       return _web3Modal;
     }
@@ -100,7 +132,22 @@ function App() {
     return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
   }
   
-  async function setErc20Contract(v: string) {
+  // FIXME: returns Promise?
+  async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
+    sendArgs = sendArgs || {}
+    const web3 = await getWeb3();
+    const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+    return method.bind(contract)(...args).estimateGas({gas: '1000000', from: account, ...sendArgs}).
+        then((estimatedGas: string) => {
+            const gas = String(Math.floor(Number(estimatedGas) * 1.15) + 24000);
+            if(handler !== undefined)
+                return method.bind(contract)(...args).send({gas, from: account, ...sendArgs}, handler);
+            else
+                return method.bind(contract)(...args).send({gas, from: account, ...sendArgs});
+        });
+  }
+  
+    async function setErc20Contract(v: string) {
     _setErc20Contract(v);
     if(isAddressValid(v)) {
       _setErc1155Token(toBN(v).toString());
@@ -195,20 +242,26 @@ function App() {
     // TODO: Don't call functions repeatedly.
     if (_lockerContract !== '') {
       const abi = (await getABIs()).ERC1155LockedERC20;
-      const web3 = await getWeb3();
-      if (web3 !== null) {
-        const erc1155 = new web3.eth.Contract(abi as any, _lockerContract);
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+      if (abi) {
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          const erc1155 = new web3.eth.Contract(abi as any, _lockerContract);
+          const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
 
-        erc1155.methods.balanceOf(account, _erc1155Token).call()
-          .then((balance: string) => {
-            setLockedErc1155Amount(balance);
-          })
-          .catch(() => {
+          if (_erc1155Token !== '') {
+            erc1155.methods.balanceOf(account, _erc1155Token).call()
+              .then((balance: string) => {
+                setLockedErc1155Amount(balance);
+              })
+              .catch(() => {
+                setLockedErc1155Amount("");
+              });
+          } else {
             setLockedErc1155Amount("");
-          });
-      } else {
-        setLockedErc1155Amount("");
+          }
+        } else {
+          setLockedErc1155Amount("");
+        }
       }
     } else {
       setLockedErc1155Amount("");
@@ -220,8 +273,22 @@ function App() {
     await loadLockedIn1155(v, erc1155Token);
   }
 
+  getAddresses().then((addresses) => {
+    if (addresses) {
+      setLockerContract(addresses.ERC1155LockedERC20.address);
+    }
+  });
+
   async function lockErc20inErc1155() {
-    // await 
+    if (lockerContract !== '') {
+      const abi = (await getABIs()).ERC1155LockedERC20;
+      const web3 = await getWeb3();
+      if (web3 !== null) {
+        const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+        await mySend(erc1155, erc1155.methods.borrowERC20, [amount, account, account, []], null, null);
+      }
+    }
   }
 
   return (
@@ -252,7 +319,7 @@ function App() {
           {' '}
           <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
-          <input type="button" value="Lock ERC-20 in ERC-1155"/>
+          <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}/>
           {' '}
           <input type="button" value="Unlock ERC-1155 to ERC-20"/>
         </p>
