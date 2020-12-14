@@ -104,10 +104,10 @@ function App() {
     _setErc20Contract(v);
     if(isAddressValid(v)) {
       _setErc1155Token(toBN(v).toString());
-      await loadErc20(v);
     } else {
       _setErc1155Token("");
     }
+    await loadErc20(v);
   }
 
   async function setErc1155Token(v: string) {
@@ -116,10 +116,10 @@ function App() {
       const hex = Web3.utils.toHex(v);
       const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
       _setErc20Contract(Web3.utils.toChecksumAddress(addr));
-      await loadLockedIn1155(lockerContract, v);
     } else {
       _setErc20Contract("");
     }
+    await loadLockedIn1155(lockerContract, v);
   }
 
   async function loadErc20(_erc20Contract: string) {
@@ -160,7 +160,7 @@ function App() {
         "type": "function"
       },
     ];
-    if (_erc20Contract !== '') {
+    if (isAddressValid(_erc20Contract)) {
       const web3 = await getWeb3();
       if (web3 !== null) {
         const erc20 = new web3.eth.Contract(abi as any, _erc20Contract);
