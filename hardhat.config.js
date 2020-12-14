@@ -28,19 +28,19 @@ module.exports = {
     hardhat: {
       accounts: [
         {
-          privateKey: '0x0e206566a53a138f9500dd3ffaf12bbf3c773a34a0e78e6710b0726b82951e6d', // 0xfd95BF6727416050008dB2551c94C86D21bA3b77
+          privateKey: '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
           balance: '0xf0000000000000000',
         },
         {
-          privateKey: '0x3d258b188e1e2bd69821990cc143830ce2be03dc24774c787090de8ef6bca214', // 0x4948C09461d37946Ea13b98d2C3f2D3C185fde2f
+          privateKey: '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1', // 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
           balance: '0xf0000000000000000',
         },
         {
-          privateKey: '0xdfe891177936f97142e0b8c6eefb7042d051536984a2bf2c46def1f01d37bf87', // 0x5530B1eC2bCD7B2fbDF780Ab5e7A4dE40541F3A8
+          privateKey: '0x6370fd033278c143179d81c5526140625662b8daa446c22ee2d73db3707e620c', // 0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b
           balance: '0xf0000000000000000',
         },
         {
-          privateKey: '0xc37ae67042d02207a663c52522dc805089c3effb4aaf8e70195782e18b7c919a', // 0x2E8a38DA64876002DFF88B0f2855f7eE6A2B0aaD
+          privateKey: '0x646f1ce2fdad0e6deeeb5c7e8e5543bdde65e86029e2fd9fc169899c440a7913', // 0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d
           balance: '0xf0000000000000000',
         },
       ]
@@ -48,11 +48,16 @@ module.exports = {
     ganache: {
       url: "http://localhost:8545",
       accounts: [
-        '0x0e206566a53a138f9500dd3ffaf12bbf3c773a34a0e78e6710b0726b82951e6d', // 0xfd95BF6727416050008dB2551c94C86D21bA3b77
-        '0x3d258b188e1e2bd69821990cc143830ce2be03dc24774c787090de8ef6bca214', // 0x4948C09461d37946Ea13b98d2C3f2D3C185fde2f
-        '0xdfe891177936f97142e0b8c6eefb7042d051536984a2bf2c46def1f01d37bf87', // 0x5530B1eC2bCD7B2fbDF780Ab5e7A4dE40541F3A8
-        '0xc37ae67042d02207a663c52522dc805089c3effb4aaf8e70195782e18b7c919a', // 0x2E8a38DA64876002DFF88B0f2855f7eE6A2B0aaD
+        '0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d', // 0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1
+        '0x6cbed15c793ce57650b9877cf6fa156fbef513c4e6134f022a85b1ffdd59b2a1', // 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+        '0x6370fd033278c143179d81c5526140625662b8daa446c22ee2d73db3707e620c', // 0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b
+        '0x646f1ce2fdad0e6deeeb5c7e8e5543bdde65e86029e2fd9fc169899c440a7913', // 0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d
       ]
+    },
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0, // here this will by default take the first account as deployer
     },
   },
 };
