@@ -105,7 +105,7 @@ function App() {
     return result;
   }
   
-    async function myWeb3Modal() {
+  async function myWeb3Modal() {
     if (_web3Modal) {
       return _web3Modal;
     }
