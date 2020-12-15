@@ -181,6 +181,19 @@ function App() {
     }
   }
 
+  (window as any).ethereum.on('chainChanged', async (chainId: any) => { // TODO: more specific type
+    // TODO: hacky code
+    // TODO: duplicate code
+    await getAddresses().then((addresses) => {
+      if (addresses) {
+        setLockerContract(addresses.ERC1155LockedERC20.address);
+        setWrapperContract(addresses.ERC1155OverERC20.address);
+      }
+    });
+    await loadLockedIn1155(lockerContract, erc20Contract);
+    await loadErc20(erc20Contract);
+  });
+
   // FIXME: returns Promise?
   async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
     sendArgs = sendArgs || {}
@@ -352,7 +365,6 @@ function App() {
   }
 
   async function approveErc1155Wrapper() {
-    console.log('a1')
     if (isAddressValid(erc20Contract)) {
       const abi = await fetchOnceJson('erc20-abi.json');
       const web3 = await getWeb3();
