@@ -168,20 +168,23 @@ function App() {
   // TODO: Connect two contracts separately.
   async function connectEvents(erc20Contract: string, lockerContract: string, erc1155Token: string) {
     console.log('connectEvents')
-    for (let ev of myEvents) {
-      if(ev) (ev as any).unsubscribe();
-    }
+    // for (let ev of myEvents) {
+    //   if(ev) (ev as any).unsubscribe();
+    // }
+    
     if(!isAddressValid(erc20Contract)) {
       return;
     }
     const web3 = await getWeb3();
     if(web3 === null) return;
+    web3.eth.clearSubscriptions();
     const account = (await getAccounts())[0];
     if(!account) return;
     if (isAddressValid(lockerContract)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
       myEvents[0] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
+        console.log('A')
         return await loadLockedIn1155(lockerContract, erc1155Token);
       });
       myEvents[1] = erc1155.events.TransferBatch({filter: {_to: account}}, async () => {
@@ -243,8 +246,9 @@ function App() {
   
   async function setErc20Contract(v: string) {
     _setErc20Contract(v);
-    const tokenId = toBN(v).toString();
+    let tokenId = "";
     if(isAddressValid(v)) {
+      tokenId = toBN(v).toString();
       _setErc1155Token(tokenId);
     } else {
       _setErc1155Token("");
@@ -262,13 +266,16 @@ function App() {
       const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
       const checksumed = Web3.utils.toChecksumAddress(addr);
       _setErc20Contract(checksumed);
+      await loadErc20(checksumed);
       await checkErc1155WrapperApproved(checksumed);
+      await connectEvents(checksumed, lockerContract, v);
     } else {
       _setErc20Contract("");
+      await loadErc20("");
       await checkErc1155WrapperApproved("");
+      await connectEvents(erc20Contract, lockerContract, v);
     }
     await loadLockedIn1155(lockerContract, v);
-    await connectEvents(erc20Contract, lockerContract, v);
   }
 
   async function loadErc20(_erc20Contract: string) {
