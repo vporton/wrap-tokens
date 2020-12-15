@@ -54,6 +54,10 @@ module.exports = {
         '0x646f1ce2fdad0e6deeeb5c7e8e5543bdde65e86029e2fd9fc169899c440a7913', // 0xE11BA2b4D45Eaed5996Cd0823791E0C93114882d
       ]
     },
+    mainnet: {
+      url: "https://mainnet.infura.io/v3/" + process.env.INFURA_KEY,
+      accounts: process.env.MAINNET_PRIVATE_KEY ? [ process.env.MAINNET_PRIVATE_KEY ] : [],
+    },
     bsc: {
       url: "https://bsc-dataseed4.ninicoin.io:443",
       accounts: process.env.MAINNET_PRIVATE_KEY ? [ process.env.MAINNET_PRIVATE_KEY ] : [],
