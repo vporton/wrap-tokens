@@ -48,7 +48,7 @@ async function myWeb3Modal() {
       mewconnect: {
           package: MewConnect, // required
           options: {
-              infuraId: "1d0c278301fc40f3a8f40f25ae3bd328" // required // FIXME
+              infuraId: "XXX" // required // FIXME
           }
       }
   };
@@ -336,44 +336,47 @@ function App() {
       const abi2 = await fetchOnceJson('erc20-abi.json');
       const web3 = await getWeb3();
       if (web3 !== null) {
-        const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
-        const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        const allowance = toBN(await erc20.methods.allowance(account, lockerContract).call());
-        const halfBig = toBN(2).pow(toBN(128));
-        if(allowance.lt(halfBig)) {
-          const big = toBN(2).pow(toBN(256)).sub(toBN(1));
-          await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
+        try {
+          const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+          const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
+          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+          const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
+          const allowance = toBN(allowanceStr);
+          const halfBig = toBN(2).pow(toBN(128));
+          if(allowance.lt(halfBig)) {
+            const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+            await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
+              .catch(e => alert(e.message));
+          }
+          await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
             .catch(e => alert(e.message));
         }
-        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
-          .catch(e => alert(e.message));
+        catch(e) {
+          alert(e.message);
+        }
       }
     }
   }
 
   async function approveErc1155Wrapper() {
     if (isAddressValid(erc20Contract)) {
-      const abi = (await getABIs()).ERC1155OverERC20;
-      const abi2 = await fetchOnceJson('erc20-abi.json');
+      const abi = await fetchOnceJson('erc20-abi.json');
       const web3 = await getWeb3();
       if (web3 !== null) {
-        const erc1155 = new web3.eth.Contract(abi as any, wrapperContract);
-        const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        let allowance;
         try {
-          allowance = toBN(await erc20.methods.allowance(account, lockerContract).call());
+          const erc20 = new web3.eth.Contract(abi as any, erc20Contract);
+          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+          const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
+          const allowance = toBN(allowanceStr);
+          const halfBig = toBN(2).pow(toBN(128));
+          if(allowance.lt(halfBig)) {
+            const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+            await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
+              .catch(e => alert(e.message));
+          }
         }
         catch(e) {
-          alert(e);
-          return;
-        }
-        const halfBig = toBN(2).pow(toBN(128));
-        if(allowance.lt(halfBig)) {
-          const big = toBN(2).pow(toBN(256)).sub(toBN(1));
-          await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
-            .catch(e => alert(e.message));
+          alert(e.message);
         }
       }
     }
@@ -384,10 +387,15 @@ function App() {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const web3 = await getWeb3();
       if (web3 !== null) {
-        const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-        await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null)
-          .catch(e => alert(e.message));
+        try {
+          const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+          await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null)
+            // .catch(e => alert(e.message));
+        }
+        catch(e) {
+          alert(e.message);
+        }
       }
     }
   }
