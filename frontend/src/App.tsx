@@ -5,8 +5,6 @@ import Web3Modal from "web3modal";
 import erc20Abi from './ERC20Abi';
 const { toBN, fromWei, toWei } = Web3.utils;
 
-// FIXME: The ERC-1155 sum flashes several times, when unlocking.
-
 let myWeb3: any = null;
 
 let abisPromise: any = null;
