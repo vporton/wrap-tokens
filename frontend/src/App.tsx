@@ -77,6 +77,7 @@ function App() {
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
   const [lockerContract, _setLockerContract] = useState('');
+  const [wrapperContract, setWrapperContract] = useState('');
   const [erc20Amount, setErc20Amount] = useState('');
   const [erc20Symbol, setErc20Symbol] = useState('');
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
@@ -324,6 +325,7 @@ function App() {
   getAddresses().then((addresses) => {
     if (addresses) {
       setLockerContract(addresses.ERC1155LockedERC20.address);
+      setWrapperContract(addresses.ERC1155OverERC20.address);
     }
   });
 
@@ -372,6 +374,8 @@ function App() {
         <p>ERC-1155 token ID:
           {' '}
           <WrappedERC20 value={erc1155Token} onChange={async (e: Event) => await setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
+        <p>ERC-1155 <small>(has bug)</small> wrapper contract address:{' '}
+          <code className="address">{wrapperContract}</code></p>
         <p>ERC-1155 locker contract address:
           {' '}
           <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
