@@ -494,7 +494,7 @@ function App() {
               Approve for ERC-1155
             </button>
             &nbsp;
-            <span style={{cursor: 'help'}} title="Allow the ERC-1155 wrapper contract to transfer funds for you (only when you explicityly request a transfer).">ⓘ</span>
+            <span style={{cursor: 'help'}} title="Allow the ERC-1155 wrapper contract to transfer funds for you (only when you explicitly request a transfer).">ⓘ</span>
           </span>
           <small style={{display: erc1155WrapperApproved ? 'inline': 'none'}}>
             (approved for ERC-1155 wrapper)
