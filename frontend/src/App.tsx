@@ -93,8 +93,6 @@ function isRealNumber(v: string): boolean { // TODO: called twice
   return /^[0-9]+(\.[0-9]+)?$/.test(v);
 }
 
-// TODO: Handle Ethereum network change.
-
 // let _fetchedPromises = new Map<string, Promise<any>>();
 let _fetchedJsonPromises = new Map<string, Promise<any>>();
 let _fetched = new Map<string, any>();
