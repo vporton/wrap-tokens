@@ -384,12 +384,13 @@ function App() {
     await loadLockedIn1155(v, erc1155Token);
   }
 
-  // getAddresses().then((addresses) => {
-  //   if (addresses) {
-  //     setLockerContract(addresses.ERC1155LockedERC20.address);
-  //     setWrapperContract(addresses.ERC1155OverERC20.address);
-  //   }
-  // });
+  // Without this does not load on Chromium, when coming by an external link:
+  getAddresses().then((addresses) => {
+    if (addresses) {
+      setLockerContract(addresses.ERC1155LockedERC20.address);
+      setWrapperContract(addresses.ERC1155OverERC20.address);
+    }
+  });
 
   async function lockErc20inErc1155() {
     if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
