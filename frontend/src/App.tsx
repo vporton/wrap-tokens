@@ -210,25 +210,27 @@ function App() {
     }
   }
 
-  (window as any).ethereum.on('chainChanged', async (chainId: any) => { // TODO: more specific type
-    // TODO: hacky code
-    // TODO: duplicate code
-    await getAddresses().then((addresses) => {
-      if (addresses) {
-        setLockerContract(addresses.ERC1155LockedERC20.address);
-        setWrapperContract(addresses.ERC1155OverERC20.address);
+  if ((window as any).ethereum) {
+    (window as any).ethereum.on('chainChanged', async (chainId: any) => { // TODO: more specific type
+      // TODO: hacky code
+      // TODO: duplicate code
+      await getAddresses().then((addresses) => {
+        if (addresses) {
+          setLockerContract(addresses.ERC1155LockedERC20.address);
+          setWrapperContract(addresses.ERC1155OverERC20.address);
+        }
+      });
+      await loadLockedIn1155(lockerContract, erc1155Token);
+      await loadErc20(erc20Contract);
+    });
+
+    (window as any).ethereum.on('accountsChanged', async function (accounts: Array<string>) {
+      if (isAddressValid(erc20Contract)) {
+        setConnectedToAccount(accounts.length !== 0);
+        await loadErc20(erc20Contract);
       }
     });
-    await loadLockedIn1155(lockerContract, erc1155Token);
-    await loadErc20(erc20Contract);
-  });
-
-  (window as any).ethereum.on('accountsChanged', async function (accounts: Array<string>) {
-    if (isAddressValid(erc20Contract)) {
-      setConnectedToAccount(accounts.length !== 0);
-      await loadErc20(erc20Contract);
-    }
-  })
+  }
 
   // FIXME: returns Promise?
   async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
@@ -476,7 +478,11 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1 style={{marginBottom: 0}}>Manage Smart Crypto Funds</h1>
-        <p style={{marginTop: 0}}><small><a href="https://github.com/vporton/wrap-tokens">Docs and source</a></small></p>
+        <p style={{marginTop: 0}}>
+          <small>
+            <a href="https://github.com/vporton/wrap-tokens">Docs and source</a> | <a href="https://portonvictor.org">Author</a>
+          </small>
+        </p>
         <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
         <p>ERC-20 token address:
           {' '}
