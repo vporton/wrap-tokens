@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+code.address { font-size: 50%; font-family: inherit; }
+
+small { font-size: 50%; font-style: italic; }
+
 .error {
   background: red;
   color: white;
