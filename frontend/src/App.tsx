@@ -103,7 +103,7 @@ function App() {
   }
 
   async function getAddresses() {
-    const [json, chainId] = await Promise.all([fetchOnceJson(`/addresses.json`), getChainId()]);
+    const [json, chainId] = await Promise.all([fetchOnceJson(`addresses.json`), getChainId()]);
     const result = json[CHAINS[chainId]]; // FIXME: if non-existing chainId
     return result;
   }
@@ -265,7 +265,7 @@ function App() {
 
   async function loadLockedIn1155(_lockerContract: string, _erc1155Token: string) {
     // TODO: Don't call functions repeatedly.
-    if (_lockerContract !== '') {
+    if (isAddressValid(_lockerContract)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
       if (abi) {
         const web3 = await getWeb3();
