@@ -330,7 +330,29 @@ function App() {
   });
 
   async function lockErc20inErc1155() {
-    if (isAddressValid(lockerContract) && erc20Contract != '') {
+    if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
+      const abi = (await getABIs()).ERC1155LockedERC20;
+      const abi2 = await fetchOnceJson('/erc20-abi.json');
+      const web3 = await getWeb3();
+      if (web3 !== null) {
+        const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+        const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
+        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+        const allowance = toBN(await erc20.methods.allowance(account, lockerContract).call());
+        const halfBig = toBN(2).pow(toBN(128));
+        if(allowance.lt(halfBig)) {
+          const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+          await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
+            .catch(alert);
+        }
+        await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
+          .catch(alert);
+      }
+    }
+  }
+
+  async function approveErc1155Wrapper() {
+    if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const abi2 = await fetchOnceJson('/erc20-abi.json');
       const web3 = await getWeb3();
@@ -352,7 +374,7 @@ function App() {
   }
 
   async function unlockErc20fromErc1155() {
-    if (isAddressValid(lockerContract) && erc20Contract != '') {
+    if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const web3 = await getWeb3();
       if (web3 !== null) {
