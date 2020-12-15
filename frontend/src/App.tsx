@@ -12,6 +12,9 @@ let myWeb3: any = null;
 let abisPromise: any = null;
 let abis: object | null = null;
 
+// TODO: Error message on locking an unexisting token.
+// TODO: Show pending transactions.
+
 // TODO
 const CHAINS: { [id: string] : string } = {
   '1': 'mainnet',
@@ -32,6 +35,54 @@ const CHAINS: { [id: string] : string } = {
 }
 
 let _web3Provider: any = null;
+let _web3Modal: any = null;
+
+async function myWeb3Modal() {
+  if (_web3Modal) {
+    return _web3Modal;
+  }
+
+  const MewConnect = require('@myetherwallet/mewconnect-web-client'); // TODO
+
+  const providerOptions = {
+      mewconnect: {
+          package: MewConnect, // required
+          options: {
+              infuraId: "1d0c278301fc40f3a8f40f25ae3bd328" // required // FIXME
+          }
+      }
+  };
+
+  return _web3Modal = new Web3Modal({
+    // network: 'mainnet',
+    cacheProvider: true,
+    providerOptions
+  });
+}
+
+async function getWeb3Provider() {
+  if(_web3Provider) {
+    return _web3Provider;
+  } else {
+    // await connectEvents();
+  }
+  return _web3Provider = (window as any).ethereum ? (await myWeb3Modal()).connect() : null;
+}
+
+async function getWeb3() {
+  if(myWeb3) return myWeb3;
+
+  _web3Provider = await getWeb3Provider();
+  return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
+}
+
+async function getChainId(): Promise<any> { // TODO: more specific type
+  const web3 = await getWeb3();
+  if (!web3) {
+    return null;
+  }
+  return await web3.eth.getChainId();
+}
 
 function isAddressValid(v: string): boolean { // TODO: called twice
   return Web3.utils.isAddress(v);
@@ -85,8 +136,6 @@ function App() {
   const [amount, setAmount] = useState('');
   const [erc1155WrapperApproved, setErc1155WrapperApproved] = useState(false);
 
-  let _web3Modal: any = null;
-
   async function getABIs() {
     return await fetchOnceJson(`/abis.json`);
   }
@@ -94,43 +143,12 @@ function App() {
   let addressesPromise: any = null;
   let addresses: object | null = null;
   
-  async function getChainId(): Promise<any> { // TODO: more specific type
-    const web3 = await getWeb3();
-    if (!web3) {
-      return null;
-    }
-    return await web3.eth.getChainId();
-  }
-
   async function getAddresses() {
     const [json, chainId] = await Promise.all([fetchOnceJson(`addresses.json`), getChainId()]);
     const result = json[CHAINS[chainId]]; // FIXME: if non-existing chainId
     return result;
   }
   
-  async function myWeb3Modal() {
-    if (_web3Modal) {
-      return _web3Modal;
-    }
-
-    const MewConnect = require('@myetherwallet/mewconnect-web-client'); // TODO
-
-    const providerOptions = {
-        mewconnect: {
-            package: MewConnect, // required
-            options: {
-                infuraId: "1d0c278301fc40f3a8f40f25ae3bd328" // required // FIXME
-            }
-        }
-    };
-
-    return _web3Modal = new Web3Modal({
-      // network: 'mainnet',
-      cacheProvider: true,
-      providerOptions
-    });
-  }
-
   let myEvents = [null, null, null, null, null];
   
   // TODO: Connect two contracts separately.
@@ -169,22 +187,6 @@ function App() {
     }
   }
 
-  async function getWeb3Provider() {
-    if(_web3Provider) {
-      return _web3Provider;
-    } else {
-      // await connectEvents();
-    }
-    return _web3Provider = (window as any).ethereum ? (await myWeb3Modal()).connect() : null;
-  }
-  
-  async function getWeb3() {
-    if(myWeb3) return myWeb3;
-  
-    _web3Provider = await getWeb3Provider();
-    return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
-  }
-  
   // FIXME: returns Promise?
   async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
     sendArgs = sendArgs || {}
