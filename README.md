@@ -62,6 +62,18 @@ npx hardhat compile
 npx hardhat deploy --network ...
 ```
 
+## Testing
+
+```sh
+yarn
+npx hardhat test
+```
+
+You can create new ERC-20 tokens for testing by a command like:
+```sh
+ACCOUNT=0x... npx hardhat run scripts/mint-erc20.js --network ganache
+```
+
 ## Contract addresses
 
 ### Binance Smart Chain
