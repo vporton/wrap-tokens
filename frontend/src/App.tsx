@@ -7,6 +7,8 @@ import Web3 from 'web3';
 import erc20Abi from './ERC20Abi';
 const { toBN, fromWei, toWei } = Web3.utils;
 
+// TODO: This code is messy.
+
 let myWeb3: any = null;
 
 let abisPromise: any = null;
@@ -68,7 +70,7 @@ let _web3Modal: any = null;
 //   return _web3Provider = (window as any).ethereum ? await (await myWeb3Modal()).connect() : null;
 // }
 
-async function getWeb3() {
+async function baseGetWeb3() {
   if(myWeb3) return myWeb3;
 
   _web3Provider = Web3.givenProvider; //await getWeb3Provider();
@@ -76,11 +78,11 @@ async function getWeb3() {
 }
 
 async function getChainId(): Promise<any> { // TODO: more specific type
-  const web3 = await getWeb3();
+  const web3 = await baseGetWeb3();
   if (!web3) {
     return null;
   }
-  return await web3.eth.getChainId();
+  return await (web3 as any).eth.getChainId();
 }
 
 function isAddressValid(v: string): boolean { // TODO: called twice
@@ -123,6 +125,7 @@ async function fetchOnceJson(url: string): Promise<any> {
 }
 
 function App() {
+  const [connectedToAccount, setConnectedToAccount] = useState(true); // Don't show the message by default.
   const [erc20Contract, _setErc20Contract] = useState('');
   const [erc1155Token, _setErc1155Token] = useState('');
   const [lockerContract, _setLockerContract] = useState('');
@@ -132,6 +135,18 @@ function App() {
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
   const [amount, setAmount] = useState('');
   const [erc1155WrapperApproved, setErc1155WrapperApproved] = useState(false);
+
+  async function getWeb3() {
+    try {
+      (window as any).ethereum.enable().catch(() => {}); // Without this catch Firefox 83.0 crashes on user pressing Cancel.
+    }
+    catch(_) { }
+    const web3 = await baseGetWeb3();
+    getAccounts().then((accounts) => {
+      setConnectedToAccount(accounts.length !== 0);
+    });
+    return web3;
+  }
 
   async function getABIs() {
     return await fetchOnceJson(`/abis.json`);
@@ -144,7 +159,12 @@ function App() {
     const [json, chainId] = await Promise.all([fetchOnceJson(`addresses.json`), getChainId()]);
     return CHAINS[chainId] ? json[CHAINS[chainId]] : null;
   }
-  
+
+  async function getAccounts(): Promise<Array<string>> {
+    const web3 = await baseGetWeb3();
+    return web3 ? (web3 as any).eth.getAccounts() : null;
+  }
+
   let myEvents = [null, null, null, null, null];
   
   // TODO: Connect two contracts separately.
@@ -153,11 +173,16 @@ function App() {
     for (let ev of myEvents) {
       if(ev) (ev as any).unsubscribe();
     }
+    if(!isAddressValid(erc20Contract)) {
+      return;
+    }
     const web3 = await getWeb3();
-    const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+    if(web3 === null) return;
+    const account = (await getAccounts())[0];
+    if(!account) return;
     if (isAddressValid(lockerContract)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
-      const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
+      const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
       myEvents[0] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
         return await loadLockedIn1155(lockerContract, erc20Contract);
       });
@@ -167,7 +192,7 @@ function App() {
     }
     if (isAddressValid(erc20Contract)) {
       const abi = await fetchOnceJson('erc20-abi.json');
-      const erc20 = new web3.eth.Contract(abi, erc20Contract);
+      const erc20 = new (web3 as any).eth.Contract(abi, erc20Contract);
       // TODO: Don't reload token symbol.
       myEvents[2] = erc20.events.Transfer({filter: {to: account}}, async () => {
         return await loadErc20(erc20Contract);
@@ -196,11 +221,18 @@ function App() {
     await loadErc20(erc20Contract);
   });
 
+  (window as any).ethereum.on('accountsChanged', async function (accounts: Array<string>) {
+    if (isAddressValid(erc20Contract)) {
+      setConnectedToAccount(accounts.length !== 0);
+      await loadErc20(erc20Contract);
+    }
+  })
+
   // FIXME: returns Promise?
   async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
     sendArgs = sendArgs || {}
     const web3 = await getWeb3();
-    const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+    const account = (await getAccounts())[0];
     return method.bind(contract)(...args).estimateGas({gas: '1000000', from: account, ...sendArgs}).
         then((estimatedGas: string) => {
             const gas = String(Math.floor(Number(estimatedGas) * 1.15) + 24000);
@@ -245,8 +277,12 @@ function App() {
     if (isAddressValid(_erc20Contract)) {
       const web3 = await getWeb3();
       if (web3 !== null) {
-        const erc20 = new web3.eth.Contract(erc20Abi as any, _erc20Contract);
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
+        const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, _erc20Contract);
+        const account = (await getAccounts())[0];
+        if(!account) {
+          setConnectedToAccount(false);
+          return;
+        }
       
         erc20.methods.balanceOf(account).call()
           .then((balance: string) => {
@@ -275,14 +311,18 @@ function App() {
 
   async function loadLockedIn1155(_lockerContract: string, _erc1155Token: string) {
     // TODO: Don't call functions repeatedly.
-    if (isAddressValid(_lockerContract)) {
+    if (isAddressValid(_lockerContract) && isAddressValid(_erc1155Token)) {
       const abi = (await getABIs()).ERC1155LockedERC20;
       if (abi) {
         const web3 = await getWeb3();
         if (web3 !== null) {
-          const erc1155 = new web3.eth.Contract(abi as any, _lockerContract);
-          const account = ((await web3.eth.getAccounts()) as Array<string>)[0];
-
+          const erc1155 = new (web3 as any).eth.Contract(abi as any, _lockerContract);
+          const account = (await getAccounts())[0];
+          if(!account) {
+            setConnectedToAccount(false);
+            return;
+          }
+  
           if (isAddressValid(erc20Contract) && isWrappedTokenValid(_erc1155Token)) {
             erc1155.methods.balanceOf(account, _erc1155Token).call()
               .then((balance: string) => {
@@ -307,9 +347,13 @@ function App() {
     if (isAddressValid(_erc20Contract)) {
       const web3 = await getWeb3();
       if (web3 !== null) {
-        const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+        const account = (await getAccounts())[0];
+        if(!account) {
+          setErc1155WrapperApproved(false);
+          return;
+        }
         try {
-          const erc20 = new web3.eth.Contract(erc20Abi as any, _erc20Contract);
+          const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, _erc20Contract);
           const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
           const allowance = toBN(allowanceStr);
           const halfBig = toBN(2).pow(toBN(128));
@@ -331,12 +375,12 @@ function App() {
     await loadLockedIn1155(v, erc1155Token);
   }
 
-  getAddresses().then((addresses) => {
-    if (addresses) {
-      setLockerContract(addresses.ERC1155LockedERC20.address);
-      setWrapperContract(addresses.ERC1155OverERC20.address);
-    }
-  });
+  // getAddresses().then((addresses) => {
+  //   if (addresses) {
+  //     setLockerContract(addresses.ERC1155LockedERC20.address);
+  //     setWrapperContract(addresses.ERC1155OverERC20.address);
+  //   }
+  // });
 
   async function lockErc20inErc1155() {
     if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
@@ -345,10 +389,14 @@ function App() {
       const web3 = await getWeb3();
       if (web3 !== null) {
         try {
-          const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
-          const erc20 = new web3.eth.Contract(abi2 as any, erc20Contract);
-          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-          const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
+          const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
+          const erc20 = new (web3 as any).eth.Contract(abi2 as any, erc20Contract);
+          const account = (await getAccounts())[0];
+          if(!account) {
+            setConnectedToAccount(false);
+            return;
+          }
+            const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
           const allowance = toBN(allowanceStr);
           const halfBig = toBN(2).pow(toBN(128));
           if(allowance.lt(halfBig)) {
@@ -372,8 +420,12 @@ function App() {
       const web3 = await getWeb3();
       if (web3 !== null) {
         try {
-          const erc20 = new web3.eth.Contract(abi as any, erc20Contract);
-          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+          const erc20 = new (web3 as any).eth.Contract(abi as any, erc20Contract);
+          const account = (await getAccounts())[0];
+          if(!account) {
+            setConnectedToAccount(false);
+            return;
+          }
           const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
           const allowance = toBN(allowanceStr);
           const halfBig = toBN(2).pow(toBN(128));
@@ -397,8 +449,12 @@ function App() {
       const web3 = await getWeb3();
       if (web3 !== null) {
         try {
-          const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
-          const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
+          const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
+          const account = (await getAccounts())[0];
+          if(!account) {
+            setConnectedToAccount(false);
+            return;
+          }
           await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null)
             // .catch(e => alert(e.message));
         }
@@ -413,6 +469,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Manage Smart Crypto Funds</h1>
+        <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
         <p>ERC-20 token address:
           {' '}
           <Address value={erc20Contract} onChange={async (e: Event) => await setErc20Contract((e.target as HTMLInputElement).value as string)}/>
