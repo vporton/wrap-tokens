@@ -6,6 +6,10 @@
   "repository": "git@github.com:vporton/wrap-tokens.git",
   "author": "Victor Porton <porton@narod.ru>",
   "license": "GPL-3.0",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "export": "npx hardhat export-artifacts tmp && npx hardhat run scripts/export-bytecode.js && rm -rf tmp"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^3.3.0",
     "hardhat": "^2.0.5",
