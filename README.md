@@ -63,6 +63,7 @@ Finally, as said above for every of the above contracts, we have also the four c
 ```sh
 yarn
 npx hardhat compile
+yarn export
 npx hardhat deploy --network ...
 ```
 
