@@ -1,7 +1,9 @@
 import React, { useState, isValidElement, ChangeEvent } from 'react';
 import './App.css';
 import Web3 from 'web3';
-import Web3Modal from "web3modal";
+// MEWConnect does not work on Firefox 83.0 for Ubuntu.
+// import Web3Modal from "web3modal";
+// import MewConnect from '@myetherwallet/mewconnect-web-client';
 import erc20Abi from './ERC20Abi';
 const { toBN, fromWei, toWei } = Web3.utils;
 
@@ -34,42 +36,42 @@ const CHAINS: { [id: string] : string } = {
 let _web3Provider: any = null;
 let _web3Modal: any = null;
 
-async function myWeb3Modal() {
-  if (_web3Modal) {
-    return _web3Modal;
-  }
+// async function myWeb3Modal() {
+//   if (_web3Modal) {
+//     return _web3Modal;
+//   }
 
-  const MewConnect = require('@myetherwallet/mewconnect-web-client');
+//   // const MewConnect = require('@myetherwallet/mewconnect-web-client');
 
-  const providerOptions = {
-      mewconnect: {
-          package: MewConnect, // required
-          options: {
-              infuraId: "XXX" // required // FIXME
-          }
-      }
-  };
+//   const providerOptions = {
+//       mewconnect: {
+//           package: MewConnect, // required
+//           options: {
+//               infuraId: process.env.REACT_APP_INFURA_ID || '859569f6decc4446a5da1bb680e7e9cf'
+//           }
+//       }
+//   };
 
-  return _web3Modal = new Web3Modal({
-    // network: 'mainnet',
-    cacheProvider: true,
-    providerOptions
-  });
-}
+//   return _web3Modal = new Web3Modal({
+//     network: 'mainnet',
+//     cacheProvider: true,
+//     providerOptions
+//   });
+// }
 
-async function getWeb3Provider() {
-  if(_web3Provider) {
-    return _web3Provider;
-  } else {
-    // await connectEvents();
-  }
-  return _web3Provider = (window as any).ethereum ? (await myWeb3Modal()).connect() : null;
-}
+// async function getWeb3Provider() {
+//   if(_web3Provider) {
+//     return _web3Provider;
+//   } else {
+//     // await connectEvents();
+//   }
+//   return _web3Provider = (window as any).ethereum ? await (await myWeb3Modal()).connect() : null;
+// }
 
 async function getWeb3() {
   if(myWeb3) return myWeb3;
 
-  _web3Provider = await getWeb3Provider();
+  _web3Provider = Web3.givenProvider; //await getWeb3Provider();
   return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
 }
 

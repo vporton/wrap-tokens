@@ -1801,9 +1801,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@myetherwallet/mewconnect-web-client@git+ssh://git@github.com/vporton/MEWconnect-web-client.git#matic-yarn-bug-workaround":
+"@myetherwallet/mewconnect-web-client@^2.1.16":
   version "2.1.16"
-  resolved "git+ssh://git@github.com/vporton/MEWconnect-web-client.git#4e5a4b392a2a37a8bf7a571031ace6cbbeacaa00"
+  resolved "https://registry.yarnpkg.com/@myetherwallet/mewconnect-web-client/-/mewconnect-web-client-2.1.16.tgz#904ac231a884f4b09c0ae73e9f848e3debdccb20"
+  integrity sha512-j1UeL1MlUxc90NwBbUcT3c7nWY7k9HN2E5RyUQ0j3/69i2a+8T+QRUS0pOiT2+TAtkBLPgvdeCPQQqkSsxdyZA==
   dependencies:
     bignumber.js "^9.0.0"
     browser-or-node "^1.2.1"

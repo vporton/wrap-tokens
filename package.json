@@ -20,7 +20,8 @@
     "hardhat-typechain": "^0.3.3",
     "ts-morph": "^9.0.0",
     "typechain": "^4.0.0",
-    "typechain-target-ethers-v5": "^1.2.2"
+    "typechain-target-ethers-v5": "^1.2.2",
+    "@myetherwallet/mewconnect-web-client": "^2.1.16"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.0",
