@@ -14,7 +14,9 @@ It provides interface between ERC20 <-> ERC1155 through both (for your choice):
 * locked tokens
 * wrapped tokens (with a bug: events are not emitted)
 
-See also `frontend/README.md`.
+See also
+* `frontend/README.md`
+* https://youtu.be/PtfXC8ax8eI
 
 ## The smart wallet usage
 
