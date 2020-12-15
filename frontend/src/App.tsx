@@ -374,9 +374,16 @@ function App() {
             await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
               .catch(e => alert(e.message));
           }
+          const halfBig = toBN(2).pow(toBN(128));
+          if(allowance.lt(halfBig)) {
+            const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+            await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
+              .catch(e => alert(e.message));
+          }
         }
         catch(e) {
           alert(e.message);
+          return;
         }
       }
     }
