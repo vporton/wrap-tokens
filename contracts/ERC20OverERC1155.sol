@@ -1,13 +1,10 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity ^0.7.1;
 
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "./IERC1155Views.sol";
 import "./ERC20NoSymbol.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "./IMyERC20.sol";
-
-interface IMyERC1155 is IERC1155, IERC1155Views { }
+import "./IMyERC1155.sol";
 
 // This contract has a bug: It does not emit ERC-20 events.
 contract ERC20OverERC1155 is IMyERC20 {

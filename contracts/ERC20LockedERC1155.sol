@@ -2,13 +2,10 @@
 pragma solidity ^0.7.1;
 
 import "@openzeppelin/contracts/introspection/ERC165.sol";
-import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "./IERC1155Views.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol";
 import "./ERC20NoSymbol.sol";
 import "./IMyERC20.sol";
-
-interface IMyERC1155 is IERC1155, IERC1155Views { }
+import "./IMyERC1155.sol";
 
 contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     IMyERC1155 public erc1155;
