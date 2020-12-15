@@ -39,7 +39,7 @@ async function myWeb3Modal() {
     return _web3Modal;
   }
 
-  const MewConnect = require('@myetherwallet/mewconnect-web-client'); // TODO
+  const MewConnect = require('@myetherwallet/mewconnect-web-client');
 
   const providerOptions = {
       mewconnect: {
