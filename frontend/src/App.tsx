@@ -12,7 +12,6 @@ let myWeb3: any = null;
 let abisPromise: any = null;
 let abis: object | null = null;
 
-// TODO: Error message on locking an unexisting token.
 // TODO: Show pending transactions.
 
 // TODO
