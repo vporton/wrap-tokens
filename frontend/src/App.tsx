@@ -142,8 +142,7 @@ function App() {
   
   async function getAddresses() {
     const [json, chainId] = await Promise.all([fetchOnceJson(`addresses.json`), getChainId()]);
-    const result = json[CHAINS[chainId]]; // FIXME: if non-existing chainId
-    return result;
+    return CHAINS[chainId] ? json[CHAINS[chainId]] : null;
   }
   
   let myEvents = [null, null, null, null, null];
@@ -356,6 +355,7 @@ function App() {
   }
 
   async function approveErc1155Wrapper() {
+    console.log('a1')
     if (isAddressValid(erc20Contract)) {
       const abi = await fetchOnceJson('erc20-abi.json');
       const web3 = await getWeb3();
@@ -363,7 +363,7 @@ function App() {
         try {
           const erc20 = new web3.eth.Contract(abi as any, erc20Contract);
           const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
-          const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
+          const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
           const allowance = toBN(allowanceStr);
           const halfBig = toBN(2).pow(toBN(128));
           if(allowance.lt(halfBig)) {
