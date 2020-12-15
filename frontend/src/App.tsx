@@ -13,6 +13,7 @@ let myWeb3: any = null;
 
 // TODO: Show pending transactions.
 // TODO: Better dialog than alert()
+// FIXME: After rejecting approval for lock/unlock should not ask for lock/unlock confirmation.
 
 // TODO
 const CHAINS: { [id: string] : string } = {
