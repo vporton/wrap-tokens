@@ -1,7 +1,7 @@
 # Wrap Tokens
 TD;DR: You use this system either for (or for both):
 * wrap any ERC1155 in ERC20 or vice versa
-* use an advanced smart wallet (earn, invest, recovery of a lost account, set daily transfer limits, use human-readable addresses, no transaction fees, easy DeFi, utetc., etc.) instead of a plain Ethereum account
+* use an advanced smart wallet (earn, invest, recovery of a lost account, set daily transfer limits, use human-readable addresses, no transaction fees, easy DeFi, etc., etc.) instead of a plain Ethereum account
 * bequest your funds for science and free software (please do!), you can even keep doing DeFi (earn interest) while your funds are on our "bequest" account and choose to bequest to us your interest, too
 
 Features:
