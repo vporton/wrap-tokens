@@ -18,7 +18,7 @@ const CHAINS: { [id: string] : string } = {
   '4': 'rinkeby',
   '5': 'goerli',
   '42': 'kovan',
-  '1337': 'local', // FIXME
+  '1337': 'local',
   '122': 'fuse',
   '80001': 'mumbai',
   '137': 'matic',
@@ -415,7 +415,7 @@ function Address({...props}) {
   )
 }
 
-function WrappedERC20({...props}) { // FIXME: rename
+function WrappedERC20({...props}) {
   return (
     <span className="WrappedERC20">
       <input type="text"
