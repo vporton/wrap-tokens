@@ -10,6 +10,7 @@ function exportContract(name) {
     const text = fs.readFileSync(`tmp/${name}.json`);
     const json = JSON.parse(text);
     fs.writeFileSync(`frontend/public/bytecode/${name}.bytecode`, json.bytecode);
+    fs.writeFileSync(`frontend/public/bytecode/${name}.abi`, JSON.stringify(json.abi));
 }
 
 async function main() {
