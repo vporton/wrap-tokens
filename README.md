@@ -34,7 +34,7 @@ Moreover, unlike the Argent wallet, all our `SmartWalletWith*` contracts are ful
 
 ## FAQ
 
-**Can it happen that my funds will be taken before the set time passes?**
+**Can it happen that my bequest for science will be taken before the set time passes?**
 
 No, the smart contract are written in such a way, that we can increase but can't decrease the period of time we can't take your funds.
 
