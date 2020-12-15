@@ -229,7 +229,6 @@ function App() {
   async function loadErc20(_erc20Contract: string) {
     console.log('loadErc20', _erc20Contract);
     // TODO: Don't call functions repeatedly.
-    // TODO: Move inside
     if (isAddressValid(_erc20Contract)) {
       const web3 = await getWeb3();
       if (web3 !== null) {
