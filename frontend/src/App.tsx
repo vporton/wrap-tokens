@@ -5,7 +5,7 @@ import Web3Modal from "web3modal";
 import erc20Abi from './ERC20Abi';
 const { toBN, fromWei, toWei } = Web3.utils;
 
-// FIXME: Funny error message when rejecting a transaction in MetaMask.
+// FIXME: The ERC-1155 sum flashes several times, when unlocking.
 
 let myWeb3: any = null;
 
@@ -344,10 +344,10 @@ function App() {
         if(allowance.lt(halfBig)) {
           const big = toBN(2).pow(toBN(256)).sub(toBN(1));
           await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
-            .catch(alert);
+            .catch(e => alert(e.message));
         }
         await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
-          .catch(alert);
+          .catch(e => alert(e.message));
       }
     }
   }
@@ -373,7 +373,7 @@ function App() {
         if(allowance.lt(halfBig)) {
           const big = toBN(2).pow(toBN(256)).sub(toBN(1));
           await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
-            .catch(alert);
+            .catch(e => alert(e.message));
         }
       }
     }
@@ -387,7 +387,7 @@ function App() {
         const erc1155 = new web3.eth.Contract(abi as any, lockerContract);
         const account = ((await web3.eth.getAccounts()) as Array<string>)[0]; // TODO: duplicate code
         await mySend(erc1155, erc1155.methods.returnToERC20, [erc20Contract, toWei(amount), account], {from: account}, null)
-          .catch(alert);
+          .catch(e => alert(e.message));
       }
     }
   }
