@@ -366,16 +366,6 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Manage Smart Crypto Funds</h1>
-        <p className="deployButtons">Deploy ERC-20 token:{' '}
-          <a href="#">ERC-1155 token locked in ERC-20 contract</a> |{' '}
-          <a href="#">ERC-1155 token wrapped into ERC-20 contract</a>
-        </p>
-        <p className="deployButtons">Deploy smart wallet:{' '}
-          <a href="#">ERC-1155 locked in ERC-20</a> |{' '}
-          <a href="#">ERC-1155 wrapped into ERC-20</a>  |{' '}
-          <a href="#">ERC-20 locked in ERC-1155</a> |{' '}
-          <a href="#">ERC-20 wrapped into ERC-1155</a>
-        </p>
         <p>ERC-20 token address:
           {' '}
           <Address value={erc20Contract} onChange={async (e: Event) => await setErc20Contract((e.target as HTMLInputElement).value as string)}/></p>
