@@ -20,3 +20,5 @@ small { font-size: 50%; font-style: italic; }
   background: red;
   color: white;
 }
+
+a:link, a:visited, a:active { color: yellow; }

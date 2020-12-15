@@ -12,6 +12,7 @@ const { toBN, fromWei, toWei } = Web3.utils;
 let myWeb3: any = null;
 
 // TODO: Show pending transactions.
+// TODO: Better dialog than alert()
 
 // TODO
 const CHAINS: { [id: string] : string } = {
@@ -466,7 +467,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Manage Smart Crypto Funds</h1>
+        <h1 style={{marginBottom: 0}}>Manage Smart Crypto Funds</h1>
+        <p style={{marginTop: 0}}><small><a href="https://github.com/vporton/wrap-tokens">Docs and source</a></small></p>
         <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
         <p>ERC-20 token address:
           {' '}
