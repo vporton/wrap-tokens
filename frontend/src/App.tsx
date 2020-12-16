@@ -406,7 +406,7 @@ function App() {
             setConnectedToAccount(false);
             return;
           }
-            const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
+          const allowanceStr = await erc20.methods.allowance(account, lockerContract).call();
           const allowance = toBN(allowanceStr);
           const halfBig = toBN(2).pow(toBN(128));
           if(allowance.lt(halfBig)) {
