@@ -1,3 +1,4 @@
+* create and use ERC-20 contracts through the registry
 * audit
 * ERC1155LockedERC721
 * ERC1155OverERC721
