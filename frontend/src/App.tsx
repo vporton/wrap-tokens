@@ -149,10 +149,7 @@ function App() {
   async function getABIs() {
     return await fetchOnceJson(`/abis.json`);
   }
-  
-  let addressesPromise: any = null;
-  let addresses: object | null = null;
-  
+
   async function getAddresses() {
     const [json, chainId] = await Promise.all([fetchOnceJson(`addresses.json`), getChainId()]);
     return CHAINS[chainId] ? json[CHAINS[chainId]] : null;
