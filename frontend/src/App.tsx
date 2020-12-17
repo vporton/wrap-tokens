@@ -474,7 +474,7 @@ function App() {
     }
   }
 
-  // TODO: <script> should be in <head>.
+  // TODO: <script> should be in <head>. // TODO: Google Analytics does not work.
   return (
     <div className="App">
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-6ZX3GEN0J8"></script>
