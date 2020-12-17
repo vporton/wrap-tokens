@@ -474,13 +474,6 @@ function App() {
   // TODO: <script> should be in <head>. // TODO: Google Analytics does not work.
   return (
     <div className="App">
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-6ZX3GEN0J8"></script>
-      <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){"{"}dataLayer.push(arguments);{"}"}
-        gtag('js', new Date());
-        gtag('config', 'G-6ZX3GEN0J8');
-      </script>
       <header className="App-header">
         <h1 style={{marginBottom: 0}}>Manage Smart Crypto Funds</h1>
         <p style={{marginTop: 0}}>

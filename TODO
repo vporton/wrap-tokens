@@ -1,3 +1,4 @@
+* use proxy contract to create ERC-20 contracts
 * create and use ERC-20 contracts through the registry
 * audit
 * ERC1155LockedERC721
