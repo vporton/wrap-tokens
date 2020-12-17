@@ -1,7 +1,7 @@
 import React, { useState, isValidElement, ChangeEvent } from 'react';
 import './App.css';
 import Web3 from 'web3';
-// MEWConnect does not work on Firefox 83.0 for Ubuntu.
+// MEWConnect does not work on Firefox 84.0 for Ubuntu.
 // import Web3Modal from "web3modal";
 // import MewConnect from '@myetherwallet/mewconnect-web-client';
 import erc20Abi from './ERC20Abi';
@@ -136,7 +136,7 @@ function App() {
 
   async function getWeb3() {
     try {
-      (window as any).ethereum.enable().catch(() => {}); // Without this catch Firefox 83.0 crashes on user pressing Cancel.
+      (window as any).ethereum.enable().catch(() => {}); // Without this catch Firefox 84.0 crashes on user pressing Cancel.
     }
     catch(_) { }
     const web3 = await baseGetWeb3();
