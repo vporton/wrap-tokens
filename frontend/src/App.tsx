@@ -488,7 +488,11 @@ function App() {
         <h1 style={{marginBottom: 0}}>Manage Smart Crypto Funds</h1>
         <p style={{marginTop: 0}}>
           <small>
-            <a href="https://github.com/vporton/wrap-tokens">Docs and source</a> | <a href="https://portonvictor.org">Author</a>
+            <a href="https://github.com/vporton/wrap-tokens">Docs and source</a>
+            {' '}|{' '}
+            <a href="https://portonvictor.org">Author</a>
+            {' '}|{' '}
+            <a href="https://gitcoin.co/grants/1591/science-of-the-future">Donate</a>
           </small>
         </p>
         <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
