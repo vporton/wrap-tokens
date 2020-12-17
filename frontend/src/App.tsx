@@ -13,7 +13,6 @@ let myWeb3: any = null;
 
 // TODO: Show pending transactions.
 // TODO: Better dialog than alert()
-// FIXME: After rejecting approval for lock/unlock should not ask for lock/unlock confirmation.
 
 // TODO
 const CHAINS: { [id: string] : string } = {
@@ -412,7 +411,7 @@ function App() {
           if(allowance.lt(halfBig)) {
             const big = toBN(2).pow(toBN(256)).sub(toBN(1));
             await mySend(erc20, erc20.methods.approve, [lockerContract, big], {from: account}, null)
-              .catch(e => alert(e.message));
+              // .catch(e => alert(e.message));
           }
           await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
             .catch(e => alert(e.message));
@@ -442,7 +441,7 @@ function App() {
           if(allowance.lt(halfBig)) {
             const big = toBN(2).pow(toBN(256)).sub(toBN(1));
             await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
-              .catch(e => alert(e.message));
+              // .catch(e => alert(e.message));
           }
         }
         catch(e) {
