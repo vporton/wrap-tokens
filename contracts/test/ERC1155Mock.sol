@@ -9,7 +9,7 @@ import "../IERC1155Views.sol";
  * This mock just allows minting for testing purposes
  */
 contract ERC1155Mock is ERC1155, IERC1155Views {
-    constructor (string memory uri_) ERC1155(uri_) { }
+    constructor () ERC1155("https://example.com") { }
 
     function mint(address to, uint256 id, uint256 value, bytes memory data) public {
         _mint(to, id, value, data);

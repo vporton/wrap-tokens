@@ -22,6 +22,7 @@
     "typechain": "^4.0.0",
     "typechain-target-ethers-v5": "^1.2.2",
     "@myetherwallet/mewconnect-web-client": "^2.1.16",
+    "chai-bignumber": "^3.0.0",
     "eslint": "^7.11.0"
   },
   "devDependencies": {
