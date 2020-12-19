@@ -181,7 +181,6 @@ function App() {
       const abi = (await getABIs()).ERC1155LockedERC20;
       const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
       myEvents[0] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
-        console.log('A')
         return await loadLockedIn1155(lockerContract, erc1155Token);
       });
       myEvents[1] = erc1155.events.TransferBatch({filter: {_to: account}}, async () => {
