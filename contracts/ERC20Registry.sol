@@ -1,6 +1,9 @@
 //SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity >=0.7.1;
 
+// FIXME: Use proxy.
+// FIXME: Deploy multiple contracts by one call.
+
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import './ERC20OverERC1155.sol';
 import './ERC20LockedERC1155.sol';
