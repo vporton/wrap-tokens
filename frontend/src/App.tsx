@@ -485,7 +485,6 @@ function App() {
             <li><NavLink to="/erc1155toerc20">ERC1155 &rarr; ERC20</NavLink></li>
           </ul>
           <div className="content">
-            <h1 style={{marginBottom: 0}}>ERC20 ↔ ERC1155</h1>
             <p style={{marginTop: 0}}>
               <small>
                 <a href="https://github.com/vporton/wrap-tokens">Docs and source</a>
