@@ -1,4 +1,9 @@
 import React, { useState, isValidElement, ChangeEvent } from 'react';
+import {
+  Route,
+  NavLink,
+  HashRouter
+} from "react-router-dom";
 import './App.css';
 import Web3 from 'web3';
 // MEWConnect does not work on Firefox 84.0 for Ubuntu.
@@ -472,66 +477,74 @@ function App() {
 
   // TODO: <script> should be in <head>. // TODO: Google Analytics does not work.
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1 style={{marginBottom: 0}}>Manage Smart Crypto Funds</h1>
-        <p style={{marginTop: 0}}>
-          <small>
-            <a href="https://github.com/vporton/wrap-tokens">Docs and source</a>
-            {' '}|{' '}
-            <a href="https://portonvictor.org">Author</a>
-            {' '}|{' '}
-            <a href="https://gitcoin.co/grants/1591/science-of-the-future">Donate</a>
-          </small>
-        </p>
-        <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
-        <p>ERC-20 token address:
-          {' '}
-          <Address value={erc20Contract} onChange={async (e: Event) => await setErc20Contract((e.target as HTMLInputElement).value as string)}/>
-          {' '}
-          <span style={{display: erc1155WrapperApproved ? 'none': 'inline'}}>
-            <button onClick={approveErc1155Wrapper} disabled={!isAddressValid(erc20Contract)}>
-              Approve for ERC-1155
-            </button>
-            &nbsp;
-            <span style={{cursor: 'help'}} title="Allow the ERC-1155 wrapper contract to transfer funds for you (only when you explicitly request a transfer).">ⓘ</span>
-          </span>
-          <small style={{display: erc1155WrapperApproved ? 'inline': 'none'}}>
-            (approved for ERC-1155 wrapper)
-          </small>
-        </p>
-        <p>ERC-1155 <small>(has bug)</small> wrapper contract address:{' '}
-          <code className="address">{wrapperContract}</code></p>
-        <p>ERC-1155 token ID:
-          {' '}
-          <WrappedERC20 value={erc1155Token} onChange={async (e: Event) => await setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
-        <p>ERC-1155 locker contract address:
-          {' '}
-          <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
-          <br/>
-          <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
-        <p>Amount on ERC-20:
-          {' '}
-          <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span>
-          {' '}
-          <span>{erc20Symbol}</span></p>
-        <p>Amount locked in ERC-1155:
-          {' '}
-          <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
-        <p>
-          Amount:
-          {' '}
-          <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
-          {' '}
-          <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}
-                 disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
-          {' '}
-          <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}
-                 disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
-        </p>
-        <p>Locking/unlocking is 1/1 swap.</p>
-      </header>
-    </div>
+    <HashRouter>
+      <div className="App">
+        <header className="App-header">
+          <ul className="header">
+            <li><NavLink exact to="/">ERC20 &rarr; ERC1155</NavLink></li>
+            <li><NavLink to="/erc1155toerc20">ERC1155 &rarr; ERC20</NavLink></li>
+          </ul>
+          <div className="content">
+            <h1 style={{marginBottom: 0}}>ERC20 ↔ ERC1155</h1>
+            <p style={{marginTop: 0}}>
+              <small>
+                <a href="https://github.com/vporton/wrap-tokens">Docs and source</a>
+                {' '}|{' '}
+                <a href="https://portonvictor.org">Author</a>
+                {' '}|{' '}
+                <a href="https://gitcoin.co/grants/1591/science-of-the-future">Donate</a>
+              </small>
+            </p>
+            <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
+            <p>ERC-20 token address:
+              {' '}
+              <Address value={erc20Contract} onChange={async (e: Event) => await setErc20Contract((e.target as HTMLInputElement).value as string)}/>
+              {' '}
+              <span style={{display: erc1155WrapperApproved ? 'none': 'inline'}}>
+                <button onClick={approveErc1155Wrapper} disabled={!isAddressValid(erc20Contract)}>
+                  Approve for ERC-1155
+                </button>
+                &nbsp;
+                <span style={{cursor: 'help'}} title="Allow the ERC-1155 wrapper contract to transfer funds for you (only when you explicitly request a transfer).">ⓘ</span>
+              </span>
+              <small style={{display: erc1155WrapperApproved ? 'inline': 'none'}}>
+                (approved for ERC-1155 wrapper)
+              </small>
+            </p>
+            <p>ERC-1155 <small>(has bug)</small> wrapper contract address:{' '}
+              <code className="address">{wrapperContract}</code></p>
+            <p>ERC-1155 token ID:
+              {' '}
+              <WrappedERC20 value={erc1155Token} onChange={async (e: Event) => await setErc1155Token((e.target as HTMLInputElement).value as string)}/></p>
+            <p>ERC-1155 locker contract address:
+              {' '}
+              <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
+              <br/>
+              <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
+            <p>Amount on ERC-20:
+              {' '}
+              <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span>
+              {' '}
+              <span>{erc20Symbol}</span></p>
+            <p>Amount locked in ERC-1155:
+              {' '}
+              <span>{lockedErc1155Amount === '' ? '–' : fromWei(lockedErc1155Amount)}</span></p>
+            <p>
+              Amount:
+              {' '}
+              <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
+              {' '}
+              <input type="button" value="Lock ERC-20 in ERC-1155" onClick={lockErc20inErc1155}
+                    disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
+              {' '}
+              <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}
+                    disabled={!isAddressValid(erc20Contract) || !isRealNumber(amount)}/>
+            </p>
+            <p>Locking/unlocking is 1/1 swap.</p>
+          </div>
+        </header>
+      </div>
+    </HashRouter>
   );
 }
 
