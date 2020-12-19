@@ -92,6 +92,10 @@ function isAddressValid(v: string): boolean { // TODO: called twice
   return Web3.utils.isAddress(v);
 }
 
+function isUint256Valid(v: string): boolean { // TODO: called twice
+  return /^[0-9]+$/.test(v) && toBN(v).lt(toBN(2).pow(toBN(256)));
+}
+
 function isWrappedTokenValid(v: string): boolean { // TODO: called twice
   return /^[0-9]+$/.test(v) && toBN(v).lt(toBN(2).pow(toBN(160)));
 }
@@ -527,15 +531,66 @@ function App() {
     );
   }
 
+  const [erc1155Contract, _setErc1155Contract] = useState('');
+
+  async function approveErc20Wrapper() {
+  }
+
+  function Erc1155ToERC20() {
+    return (
+      <div>
+        <p>ERC-1155 contract:
+          {' '}
+          <Address value={erc1155Contract} onChange={async (e: Event) => await _setErc1155Contract((e.target as HTMLInputElement).value as string)}/>
+          {' '}
+          <span style={{display: erc1155WrapperApproved ? 'none': 'inline'}}>
+            <button onClick={approveErc20Wrapper} disabled={!isAddressValid(erc1155Contract)}>
+              Approve for ERC-20
+            </button>
+            &nbsp;
+            <span style={{cursor: 'help'}} title="Allow the ERC-20 wrapper contract to transfer funds for you (only when you explicitly request a transfer).">ⓘ</span>
+          </span>
+          <small style={{display: erc1155WrapperApproved ? 'inline': 'none'}}>
+            (approved for ERC-20 wrapper)
+          </small>
+        </p>
+        <p>ERC-1155 token ID:
+          {' '}
+          <Uint256/>
+        </p>
+        <p>Wrapper contract: <button>Create</button></p>
+        <p>Locker contract: <button>Create</button></p>
+        <p>Amount on ERC-1155:
+          {' '}
+          <span>–</span></p>
+        <p>Amount locked in ERC-20:
+          {' '}
+          <span>–</span></p>
+        <p>
+          Amount:
+          {' '}
+          <Amount value={amount}/>
+          {' '}
+          <input type="button" value="Lock ERC-1155 in ERC-20"
+                 disabled={true}/>
+          {' '}
+          <input type="button" value="Unlock ERC-1155 to ERC-20" onClick={unlockErc20fromErc1155}
+                 disabled={true}/>
+        </p>
+        <p>Locking/unlocking is 1/1 swap.</p>
+      </div>
+    );
+  }
+
   // TODO: <script> should be in <head>. // TODO: Google Analytics does not work.
   return (
     <HashRouter>
       <div className="App">
         <header className="App-header">
           <ul className="header">
-            <li><NavLink exact to="/">ERC20 &rarr; ERC1155</NavLink></li>
-            <li><NavLink to="/erc1155toerc20">ERC1155 &rarr; ERC20</NavLink></li>
-          </ul>
+            <li><NavLink exact to="/">ERC20 &rarr; ERC1155</NavLink></li>
+            <li><NavLink to="/erc1155toErc20">ERC1155 &rarr; ERC20</NavLink></li>
+          </ul>
           <p style={{marginTop: 0}}>
             <small>
               <a href="https://github.com/vporton/wrap-tokens">Docs and source</a>
@@ -548,6 +603,7 @@ function App() {
           <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
           <div className="content">
             <Route exact path="/" component={Erc20ToERC1155}/>
+            <Route path="/erc1155toErc20" component={Erc1155ToERC20}/>
           </div>
         </header>
       </div>
@@ -564,6 +620,19 @@ function Address({...props}) {
              value={props.value ? props.value : ""}
              onChange={props.onChange}
              className={isAddressValid(props.value) ? '' : 'error'}/>
+    </span>
+  )
+}
+
+function Uint256({...props}) {
+  return (
+    <span className="Uint256">
+      <input type="text"
+             maxLength={78}
+             size={92}
+             value={props.value}
+             onChange={props.onChange}
+             className={isUint256Valid(props.value) ? '' : 'error'}/>
     </span>
   )
 }
