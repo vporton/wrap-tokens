@@ -6,6 +6,7 @@ execSync("npx react-scripts build");
 fs.writeFileSync("build/CNAME", "erc1155.portonvictor.org");
 
 const inhead = `
+<base href="http://localhost/~porton/erc/"/>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6ZX3GEN0J8"></script>
 <script>
@@ -14,6 +15,12 @@ const inhead = `
   gtag('js', new Date());
 
   gtag('config', 'G-6ZX3GEN0J8');
+</script>
+<script>
+//window.addEventListener('load', (event) => {
+//  const head = document.querySelector('head');
+//  head.innerHTML += "<base href='location.href=location.href.replace(/[\\^]*$/, \\\"\\\")'/>";
+//});
 </script>
 `;
 
