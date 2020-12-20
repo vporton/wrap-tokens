@@ -14,22 +14,20 @@ contract ERC20Registry {
 
     function registerWrapper(IERC1155 _erc1155, uint256 _tokenId) public returns (ERC20OverERC1155 _erc20) {
         _erc20 = wrappers[address(_erc1155)][_tokenId];
-        if (address(_erc20) != address(0)) {
-            return _erc20;
+        if (address(_erc20) == address(0)) {
+            _erc20 = new ERC20OverERC1155(IMyERC1155(address(_erc1155)), _tokenId);
+            wrappers[address(_erc1155)][_tokenId] = _erc20;
+            emit WrapperRegistered(msg.sender, _erc1155, _tokenId, _erc20);
         }
-        _erc20 = new ERC20OverERC1155(IMyERC1155(address(_erc1155)), _tokenId);
-        wrappers[address(_erc1155)][_tokenId] = _erc20;
-        emit WrapperRegistered(msg.sender, _erc1155, _tokenId, _erc20);
     }
 
     function registerLocker(IERC1155 _erc1155, uint256 _tokenId) public returns (ERC20LockedERC1155 _erc20) {
         _erc20 = lockers[address(_erc1155)][_tokenId];
-        if (address(_erc20) != address(0)) {
-            return _erc20;
+        if (address(_erc20) == address(0)) {
+            _erc20 = new ERC20LockedERC1155(IMyERC1155(address(_erc1155)), _tokenId);
+            lockers[address(_erc1155)][_tokenId] = _erc20;
+            emit LockerRegistered(msg.sender, _erc1155, _tokenId, _erc20);
         }
-        _erc20 = new ERC20LockedERC1155(IMyERC1155(address(_erc1155)), _tokenId);
-        lockers[address(_erc1155)][_tokenId] = _erc20;
-        emit LockerRegistered(msg.sender, _erc1155, _tokenId, _erc20);
     }
 
     function getWrapper(IERC1155 _erc1155, uint256 _tokenId) public view returns (ERC20OverERC1155) {
