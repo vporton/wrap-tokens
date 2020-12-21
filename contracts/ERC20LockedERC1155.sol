@@ -11,13 +11,11 @@ contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     IMyERC1155 public erc1155;
     uint256 public tokenId;
 
-    // solhint-disable func-visibility
-    constructor(IMyERC1155 _erc1155, uint256 _tokenId)
-    {
+    function initialize(IMyERC1155 _erc1155, uint256 _tokenId) public {
+        require(address(_erc1155) == address(0), "already initialized");
         erc1155 = _erc1155;
         tokenId = _tokenId;
     }
-    // solhint-enable func-visibility
 
     /// Before calling this need to approve the ERC-1155 contract.
     function borrowERC1155(uint256 _amount, address _from, address _to, bytes calldata _data) public {
