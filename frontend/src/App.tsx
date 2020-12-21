@@ -546,13 +546,6 @@ function App() {
   
     async function setErc1155Contract(v: string) {
       _setErc1155Contract(v);
-      let tokenId = "";
-      if(isAddressValid(v)) {
-        tokenId = toBN(v).toString();
-        _setErc1155Token2(tokenId);
-      } else {
-        _setErc1155Token2("");
-      }
       // await loadErc20(v);
       // await loadLockedIn1155(lockerContract, tokenId);
       // await connectEvents(v, lockerContract, tokenId);
