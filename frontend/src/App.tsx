@@ -156,7 +156,7 @@ function App() {
   }
 
   async function getABIs() {
-    return await fetchOnceJson(`/abis.json`);
+    return await fetchOnceJson(`abis.json`);
   }
 
   async function getAddresses() {

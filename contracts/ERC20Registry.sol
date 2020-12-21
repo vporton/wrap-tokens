@@ -51,6 +51,28 @@ contract ERC20Registry {
         }
     }
 
+    function registerWrappersBatch(IERC1155[] calldata _erc1155s, uint256[] calldata _tokenIds)
+        public returns (ERC20OverERC1155[] memory _erc20s)
+    {
+        require(_erc1155s.length == _tokenIds.length, "arguments lengths don't match");
+
+        _erc20s = new ERC20OverERC1155[](_erc1155s.length);
+        for (uint i = 0; i < _erc1155s.length; ++i) {
+            _erc20s[i] = registerWrapper(_erc1155s[i], _tokenIds[i]);
+        }
+    }
+
+    function registerLockersBatch(IERC1155[] calldata _erc1155s, uint256[] calldata _tokenIds)
+        public returns (ERC20LockedERC1155[] memory _erc20s)
+    {
+        require(_erc1155s.length == _tokenIds.length, "arguments lengths don't match");
+
+        _erc20s = new ERC20LockedERC1155[](_erc1155s.length);
+        for (uint i = 0; i < _erc1155s.length; ++i) {
+            _erc20s[i] = registerLocker(_erc1155s[i], _tokenIds[i]);
+        }
+    }
+
     function getWrapper(IERC1155 _erc1155, uint256 _tokenId) public view returns (ERC20OverERC1155) {
         return wrappers[address(_erc1155)][_tokenId];
     }
