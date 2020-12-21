@@ -618,7 +618,6 @@ function App() {
           null
         )
         .catch(e => alert(e.message)); // FIXME: Return.
-      const receipt = await tx;
       /*const receipt =*/ await tx;
       const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
       setLockerContract2(address);
