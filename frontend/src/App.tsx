@@ -591,17 +591,6 @@ function App() {
       const account = (await getAccounts())[0];
       const contractAddress = (await getAddresses())["ERC20Registry"].address;
       const registry = new (web3 as any).eth.Contract(abi, contractAddress);
-      console.log(erc1155Contract, erc1155Token2);
-      registry.events.WrapperRegistered({filter: {erc1155: erc1155Contract, tokenId: erc1155Token2}}, async () => {
-        console.log({erc1155: erc1155Contract, tokenId: erc1155Token2})
-      });
-      console.log(
-        registry,
-        registry.methods.registerWrapper,
-        [erc1155Contract, erc1155Token2],
-        {from: account},
-        null
-      )
       const tx = await mySend(
           registry,
           registry.methods.registerWrapper,
@@ -609,14 +598,32 @@ function App() {
           {from: account},
           null
         )
-        .catch(e => alert(e.message));
-      await tx;
-      // console.log(await registry.getPastEvents("allEvents", {fromBlock: 1, toBlock: "pending"}));
-      // const receipt = await (window as any).ethereum.request({
-      //   method: 'eth_getTransactionReceipt',
-      //   params: [tx.transactionHash]
-      // });
-      // console.log(receipt)
+        .catch(e => alert(e.message)); // FIXME: Return.
+      const receipt = await tx;
+      console.log(receipt.events);
+      if (receipt.events.WrapperRegistered) {
+        setWrapperContract2(receipt.events.WrapperRegistered.returnValues.erc20);
+      }
+    }
+
+    async function createErc20Locker() {
+      const web3 = await getWeb3();
+      const abi = (await getABIs()).ERC20Registry;
+      const account = (await getAccounts())[0];
+      const contractAddress = (await getAddresses())["ERC20Registry"].address;
+      const registry = new (web3 as any).eth.Contract(abi, contractAddress);
+      const tx = await mySend(
+          registry,
+          registry.methods.registerLocker,
+          [erc1155Contract, erc1155Token2],
+          {from: account},
+          null
+        )
+        .catch(e => alert(e.message)); // FIXME: Return.
+      const receipt = await tx;
+      if (receipt.events.LockerRegistered) {
+        setLockerContract2(receipt.events.LockerRegistered.returnValues.erc20);
+      }
     }
 
     return (
@@ -643,14 +650,14 @@ function App() {
         </p>
         <p>Wrapper contract:
           {' '}
-          {wrapperContract2}
+          <code className="address">{wrapperContract2}</code>
           {' '}
           <button onClick={createErc20Wrapper} style={{display: wrapperContract2 !== '' ? 'none' : 'inline'}}>Create</button></p>
         <p>Locker contract:
           {' '}
-          {lockerContract2}
+          <code className="address">{lockerContract2}</code>
           {' '}
-          <button style={{display: lockerContract2 !== '' ? 'none' : 'inline'}}>Create</button></p>
+          <button onClick={createErc20Locker} style={{display: lockerContract2 !== '' ? 'none' : 'inline'}}>Create</button></p>
         <p>Amount on ERC-1155:
           {' '}
           <span>–</span></p>
