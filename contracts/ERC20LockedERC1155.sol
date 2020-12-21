@@ -12,7 +12,7 @@ contract ERC20LockedERC1155 is ERC20NoSymbol, ERC1155Receiver, IMyERC20 {
     uint256 public tokenId;
 
     function initialize(IMyERC1155 _erc1155, uint256 _tokenId) public {
-        require(address(_erc1155) == address(0), "already initialized");
+        require(address(erc1155) == address(0), "already initialized");
         erc1155 = _erc1155;
         tokenId = _tokenId;
     }

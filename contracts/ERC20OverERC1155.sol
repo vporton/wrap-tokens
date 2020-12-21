@@ -16,7 +16,7 @@ contract ERC20OverERC1155 is IMyERC20 {
     mapping (address => mapping (address => uint256)) private _allowances;
 
     function initialize(IMyERC1155 _erc1155, uint256 _tokenId) public {
-        require(address(_erc1155) == address(0), "already initialized");
+        require(address(erc1155) == address(0), "already initialized");
         erc1155 = _erc1155;
         tokenId = _tokenId;
     }
