@@ -600,7 +600,6 @@ function App() {
         )
         .catch(e => alert(e.message)); // FIXME: Return.
       const receipt = await tx;
-      console.log(receipt.events);
       if (receipt.events.WrapperRegistered) {
         setWrapperContract2(receipt.events.WrapperRegistered.returnValues.erc20);
       }
