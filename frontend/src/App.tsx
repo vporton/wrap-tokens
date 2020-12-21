@@ -599,10 +599,9 @@ function App() {
           null
         )
         .catch(e => alert(e.message)); // FIXME: Return.
-      const receipt = await tx;
-      if (receipt.events.WrapperRegistered) {
-        setWrapperContract2(receipt.events.WrapperRegistered.returnValues.erc20);
-      }
+      /*const receipt =*/ await tx;
+      const address = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
+      setWrapperContract2(address);
     }
 
     async function createErc20Locker() {
@@ -620,9 +619,9 @@ function App() {
         )
         .catch(e => alert(e.message)); // FIXME: Return.
       const receipt = await tx;
-      if (receipt.events.LockerRegistered) {
-        setLockerContract2(receipt.events.LockerRegistered.returnValues.erc20);
-      }
+      /*const receipt =*/ await tx;
+      const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
+      setLockerContract2(address);
     }
 
     return (
