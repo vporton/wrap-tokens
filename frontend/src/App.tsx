@@ -557,6 +557,9 @@ function App() {
         setWrapperContract2(/^0x0+$/.test(address1) ? "" : address1);
         const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
         setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
+        if (address2 !== '') {
+          await loadLockedIn20(address2);
+        }
       }
     }
 
