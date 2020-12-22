@@ -693,10 +693,12 @@ function App() {
           {from: account},
           null
         )
-        .catch(e => alert(e.message)); // FIXME: Return.
-      /*const receipt =*/ await tx;
-      const address = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
-      setWrapperContract2(address);
+        .catch(e => alert(e.message))
+        .then(async tx => {
+          /*const receipt =*/ await tx;
+          const address = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
+          setWrapperContract2(address);
+        });
     }
 
     async function createErc20Locker() {
@@ -712,10 +714,12 @@ function App() {
           {from: account},
           null
         )
-        .catch(e => alert(e.message)); // FIXME: Return.
-      /*const receipt =*/ await tx;
-      const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
-      setLockerContract2(address);
+        .catch(e => alert(e.message))
+        .then(async tx => {
+          /*const receipt =*/ await tx;
+          const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
+          setLockerContract2(address);
+        });
     }
 
     let myEvents = [null, null, null, null, null];
@@ -800,7 +804,7 @@ function App() {
               setConnectedToAccount(false);
               return;
             }
-            await mySend(erc1155, erc1155.methods.setIsApprovedForAll, [wrapperContract2, true], {from: account}, null)
+            await mySend(erc1155, erc1155.methods.setApprovalForAll, [wrapperContract2, true], {from: account}, null)
               // .catch(e => alert(e.message));
           }
           catch(e) {
