@@ -596,9 +596,6 @@ function App() {
           setWrapperContract2(/^0x0+$/.test(address1) ? "" : address1);
           const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
           setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
-          if (address2 !== '') {
-            await loadLockedIn20();
-          }
         }
       }
     }
@@ -607,7 +604,6 @@ function App() {
       async function fetchData() {
         await loadRegistered();
         await loadErc1155();
-        await loadLockedIn20();
         await connectEvents();
         await checkErc20WrapperApproved();
       }
@@ -636,7 +632,7 @@ function App() {
             setConnectedToAccount(false);
             return;
           }
-        
+
           erc1155.methods.balanceOf(account, erc1155Token2).call()
             .then((balance: string) => {
               setErc1155Amount(balance);
@@ -669,9 +665,11 @@ function App() {
     
             erc20.methods.balanceOf(account).call()
               .then((balance: string) => {
+                console.log('a', balance); // FIXME: remove
                 setLockedErc20Amount(balance);
               })
               .catch((e: any) => {
+                console.log('b'); // FIXME: remove
                 setLockedErc20Amount("");
               });
           } else {
@@ -744,7 +742,6 @@ function App() {
       /*const receipt =*/ await tx;
       const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
       setLockerContract2(address);
-      await loadLockedIn20();
     }
 
     let myEvents = [null, null, null, null];
