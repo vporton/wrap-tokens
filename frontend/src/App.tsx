@@ -615,7 +615,16 @@ function App() {
       fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [erc1155Contract, erc1155Token2]);
-  
+
+    useEffect(() => {
+      async function fetchData() {
+        await loadLockedIn20();
+      }
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lockerContract2]);
+
     async function loadErc1155() {
       // TODO: Don't call functions repeatedly.
       if (isAddressValid(erc1155Contract) && isUint256Valid(erc1155Token2)) {
@@ -650,6 +659,7 @@ function App() {
         if (abi) {
           const web3 = await getWeb3();
           if (web3 !== null) {
+            console.log('lockerContract2', lockerContract2); // FIXME: remove
             const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
             const account = (await getAccounts())[0];
             if(!account) {
@@ -758,7 +768,7 @@ function App() {
           return await loadLockedIn20();
         });
       }
-      {
+      try {
         const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
         // TODO: Don't reload token symbol.
         myEvents[1] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
@@ -773,6 +783,7 @@ function App() {
           return await checkErc20WrapperApproved(); // FIXME
         });
       }
+      catch(_) { }
     }
 
     return (
