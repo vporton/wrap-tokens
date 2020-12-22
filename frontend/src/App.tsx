@@ -543,22 +543,48 @@ function App() {
     const [erc1155Amount, setErc1155Amount] = useState('');
     const [lockedErc20Amount, setLockedErc20Amount] = useState('');
 
+    // FIXME: Disable create buttons for contracts when there is not ERC-1155 contract or token.
+
     async function approveErc20Wrapper() {
+      if (isAddressValid(erc1155Contract) && wrapperContract2 !== "") {
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          try {
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
+            const account = (await getAccounts())[0];
+            if(!account) {
+              setConnectedToAccount(false);
+              return;
+            }
+            const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract2).call();
+            if(!approved) {
+              await mySend(erc1155, erc1155.methods.setApprovalForAll, [wrapperContract2, true], {from: account}, null)
+                // .catch(e => alert(e.message));
+            }
+          }
+          catch(e) {
+            alert(e.message);
+            return;
+          }
+        }
+      }
     }
 
     async function loadRegistered(erc1155Contract: string, erc1155Token2: string) {
-      const web3 = await getWeb3();
-      if (web3 !== null) {
-        const abi = (await getABIs()).ERC20Registry;
-        const contractAddress = (await getAddresses())["ERC20Registry"].address;
-        const registry = new (web3 as any).eth.Contract(abi, contractAddress);
+      if (isAddressValid(erc1155Contract) && isUint256Valid(erc1155Token2)) {
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          const abi = (await getABIs()).ERC20Registry;
+          const contractAddress = (await getAddresses())["ERC20Registry"].address;
+          const registry = new (web3 as any).eth.Contract(abi, contractAddress);
 
-        const address1 = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
-        setWrapperContract2(/^0x0+$/.test(address1) ? "" : address1);
-        const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
-        setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
-        if (address2 !== '') {
-          await loadLockedIn20(address2);
+          const address1 = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
+          setWrapperContract2(/^0x0+$/.test(address1) ? "" : address1);
+          const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
+          setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
+          if (address2 !== '') {
+            await loadLockedIn20(address2);
+          }
         }
       }
     }
