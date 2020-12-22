@@ -557,32 +557,8 @@ function App() {
     const [wrapperContract2, setWrapperContract2] = useState('');
     const [lockerContract2, setLockerContract2] = useState('');
     const [erc1155Amount, setErc1155Amount] = useState('');
+    const [amount, setAmount] = useState('');
     const [lockedErc20Amount, setLockedErc20Amount] = useState('');
-
-    async function approveErc20Wrapper() {
-      if (isAddressValid(erc1155Contract) && wrapperContract2 !== "") {
-        const web3 = await getWeb3();
-        if (web3 !== null) {
-          try {
-            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
-            const account = (await getAccounts())[0];
-            if(!account) {
-              setConnectedToAccount(false);
-              return;
-            }
-            const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract2).call();
-            if(!approved) {
-              await mySend(erc1155, erc1155.methods.setApprovalForAll, [wrapperContract2, true], {from: account}, null)
-                // .catch(e => alert(e.message));
-            }
-          }
-          catch(e) {
-            alert(e.message);
-            return;
-          }
-        }
-      }
-    }
 
     async function loadRegistered() {
       if (isAddressValid(erc1155Contract) && isUint256Valid(erc1155Token2)) {
@@ -655,7 +631,6 @@ function App() {
         if (abi) {
           const web3 = await getWeb3();
           if (web3 !== null) {
-            console.log('lockerContract2', lockerContract2); // FIXME: remove
             const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
             const account = (await getAccounts())[0];
             if(!account) {
@@ -665,11 +640,9 @@ function App() {
     
             erc20.methods.balanceOf(account).call()
               .then((balance: string) => {
-                console.log('a', balance); // FIXME: remove
                 setLockedErc20Amount(balance);
               })
               .catch((e: any) => {
-                console.log('b'); // FIXME: remove
                 setLockedErc20Amount("");
               });
           } else {
@@ -783,6 +756,77 @@ function App() {
       catch(_) { }
     }
 
+    async function lockErc1155inErc20() {
+      if (isAddressValid(lockerContract2)) {
+        const abi = (await getABIs()).ERC20LockedERC1155;
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          try {
+            const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, erc1155Contract);
+            const account = (await getAccounts())[0];
+            if(!account) {
+              setConnectedToAccount(false);
+              return;
+            }
+            const approved = await erc1155.methods.isApprovedForAll(account, lockerContract2).call();
+            if(approved) {
+              await mySend(erc1155, erc1155.methods.setApprovedForAll, [lockerContract2, true], {from: account}, null)
+                // .catch(e => alert(e.message));
+            }
+            await mySend(erc20, erc20.methods.borrowERC20, [erc1155Contract, erc1155Token2, toWei(amount), account, account, []], {from: account}, null)
+              .catch(e => alert(e.message));
+          }
+          catch(e) {
+            alert(e.message);
+          }
+        }
+      }
+    }
+  
+    async function approveErc20Wrapper() {
+      if (isAddressValid(lockerContract2)) {
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          try {
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
+            const account = (await getAccounts())[0];
+            if(!account) {
+              setConnectedToAccount(false);
+              return;
+            }
+            await mySend(erc1155, erc1155.methods.setIsApprovedForAll, [wrapperContract2, true], {from: account}, null)
+              // .catch(e => alert(e.message));
+          }
+          catch(e) {
+            alert(e.message);
+            return;
+          }
+        }
+      }
+    }
+  
+    async function unlockErc1155fromErc20() {
+      if (isAddressValid(lockerContract2)) {
+        const web3 = await getWeb3();
+        if (web3 !== null) {
+          try {
+            const erc20 = new (web3 as any).eth.Contract(erc20Abi, lockerContract2);
+            const account = (await getAccounts())[0];
+            if(!account) {
+              setConnectedToAccount(false);
+              return;
+            }
+            await mySend(erc20, erc20.methods.returnToERC1155, [erc1155Contract, erc1155Token2, toWei(amount), account], {from: account}, null)
+              // .catch(e => alert(e.message));
+          }
+          catch(e) {
+            alert(e.message);
+          }
+        }
+      }
+    }
+  
     return (
       <div>
         <p>ERC-1155 contract:
@@ -828,13 +872,13 @@ function App() {
         <p>
           Amount:
           {' '}
-          <Amount/>
+          <Amount value={amount} onChange={(e: Event) => setAmount((e.target as HTMLInputElement).value as string)}/>
           {' '}
-          <input type="button" value="Lock ERC-1155 in ERC-20"
-                 disabled={true}/>
+          <input type="button" value="Lock ERC-1155 in ERC-20" onClick={lockErc1155inErc20}
+                 disabled={!isAddressValid(lockerContract2)}/>
           {' '}
-          <input type="button" value="Unlock ERC-1155 to ERC-20"
-                 disabled={true}/>
+          <input type="button" value="Unlock ERC-1155 in ERC-20" onClick={unlockErc1155fromErc20}
+                 disabled={!isAddressValid(lockerContract2)}/>
         </p>
         <p>Locking/unlocking is 1/1 swap.</p>
       </div>
