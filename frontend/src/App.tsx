@@ -358,9 +358,9 @@ function App() {
         setLockedErc1155Amount("");
       }
     }
-  
-    async function checkErc1155WrapperApproved(_erc20Contract: string) {
-      if (isAddressValid(_erc20Contract)) {
+
+    async function checkErc1155WrapperApproved(_erc1155Contract: string) {
+      if (isAddressValid(_erc1155Contract)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
           const account = (await getAccounts())[0];
@@ -369,11 +369,9 @@ function App() {
             return;
           }
           try {
-            const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, _erc20Contract);
-            const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
-            const allowance = toBN(allowanceStr);
-            const halfBig = toBN(2).pow(toBN(128));
-            setErc1155WrapperApproved(!allowance.lt(halfBig));
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, _erc1155Contract);
+            const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract).call();
+            setErc1155WrapperApproved(approved);
           }
           catch(_) {
             setErc1155WrapperApproved(false);
@@ -421,7 +419,6 @@ function App() {
               await mySend(erc20, erc20.methods.approve, [lockerContract, big.toString()], {from: account}, null)
                 // .catch(e => alert(e.message));
             }
-            console.log(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
             await mySend(erc1155, erc1155.methods.borrowERC20, [erc20Contract, toWei(amount), account, account, []], {from: account}, null)
               .catch(e => alert(e.message));
           }
@@ -538,12 +535,21 @@ function App() {
     const [erc1155Contract, _setErc1155Contract] = useState('');
     const [erc1155Token2, _setErc1155Token2] = useState('');
     const [erc20WrapperApproved, setErc20WrapperApproved] = useState(false);
-    const [wrapperContract2, setWrapperContract2] = useState('');
-    const [lockerContract2, setLockerContract2] = useState('');
+    const [wrapperContract2, _setWrapperContract2] = useState('');
+    const [lockerContract2, _setLockerContract2] = useState('');
     const [erc1155Amount, setErc1155Amount] = useState('');
     const [lockedErc20Amount, setLockedErc20Amount] = useState('');
 
-    // FIXME: Disable create buttons for contracts when there is not ERC-1155 contract or token.
+    let wrapperContract2Value = "";
+
+    function setWrapperContract2(v: string) {
+      wrapperContract2Value = v;
+      _setWrapperContract2(v);
+    }
+
+    function setLockerContract2(v: string) {
+      _setLockerContract2(v);
+    }
 
     async function approveErc20Wrapper() {
       if (isAddressValid(erc1155Contract) && wrapperContract2 !== "") {
@@ -592,21 +598,21 @@ function App() {
     // TODO: parallel loading
     async function setErc1155Contract(v: string) {
       _setErc1155Contract(v);
+      await loadRegistered(v, erc1155Token2);
       await loadErc1155(v, erc1155Token2);
       await loadLockedIn20(lockerContract2);
       // await connectEvents(v, lockerContract, tokenId); // FIXME
-      await checkErc20WrapperApproved(v);
-      await loadRegistered(v, erc1155Token2);
+      await checkErc20WrapperApproved(v, wrapperContract2Value);
     }
   
     // TODO: parallel loading
     async function setErc1155Token2(v: string) {
       _setErc1155Token2(v);
+      await loadRegistered(erc1155Contract, v);
       await loadErc1155(erc1155Contract, v);
       await loadLockedIn20(lockerContract2);
       // await connectEvents(v, lockerContract, tokenId); // FIXME
-      await checkErc20WrapperApproved(erc1155Contract);
-      await loadRegistered(erc1155Contract, v);
+      await checkErc20WrapperApproved(erc1155Contract, wrapperContract2Value);
     }
   
     async function loadErc1155(_erc1155Contract: string, _tokenId: string) {
@@ -666,8 +672,8 @@ function App() {
       }
     }
   
-    async function checkErc20WrapperApproved(_erc20Contract: string) {
-      if (isAddressValid(_erc20Contract)) {
+    async function checkErc20WrapperApproved(_erc1155Contract: string, wrapperContract2: string) {
+      if (isAddressValid(_erc1155Contract) && wrapperContract2 !== '') {
         const web3 = await getWeb3();
         if (web3 !== null) {
           const account = (await getAccounts())[0];
@@ -676,10 +682,9 @@ function App() {
             return;
           }
           try {
-            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, erc1155Contract);
-            // FIXME
-            // const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract).call();
-            // setErc20WrapperApproved(approved);
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, _erc1155Contract);
+            const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract2).call();
+            setErc20WrapperApproved(approved);
           }
           catch(_) {
             setErc20WrapperApproved(false);
@@ -767,11 +772,11 @@ function App() {
   
         // TODO: Don't reload token symbol.
         myEvents[3] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
-          // return await checkErc1155WrapperApproved(erc1155Contract); // FIXME
+          // return await checkErc20WrapperApproved(erc1155Contract); // FIXME
         });
       }
     }
-  
+
     return (
       <div>
         <p>ERC-1155 contract:
@@ -779,7 +784,7 @@ function App() {
           <Address value={erc1155Contract} onChange={async (e: Event) => await setErc1155Contract((e.target as HTMLInputElement).value as string)}/>
           {' '}
           <span style={{display: erc20WrapperApproved ? 'none': 'inline'}}>
-            <button onClick={approveErc20Wrapper} disabled={!isAddressValid(erc1155Contract)}>
+            <button onClick={approveErc20Wrapper} disabled={wrapperContract2 === "" || erc20WrapperApproved}>
               Approve for ERC-20
             </button>
             &nbsp;
@@ -798,12 +803,16 @@ function App() {
           {' '}
           <code className="address">{wrapperContract2}</code>
           {' '}
-          <button onClick={createErc20Wrapper} style={{display: wrapperContract2 !== '' ? 'none' : 'inline'}}>Create</button></p>
+          <button onClick={createErc20Wrapper}
+                  style={{display: wrapperContract2 !== '' ? 'none' : 'inline'}}
+                  disabled={!isAddressValid(erc1155Contract) || !isUint256Valid(erc1155Token2)}>Create</button></p>
         <p>Locker contract:
           {' '}
           <code className="address">{lockerContract2}</code>
           {' '}
-          <button onClick={createErc20Locker} style={{display: lockerContract2 !== '' ? 'none' : 'inline'}}>Create</button></p>
+          <button onClick={createErc20Locker}
+                  style={{display: lockerContract2 !== '' ? 'none' : 'inline'}}
+                  disabled={!isAddressValid(erc1155Contract) || !isUint256Valid(erc1155Token2)}>Create</button></p>
         <p>Amount on ERC-1155:
           {' '}
           <span>{erc1155Amount === '' ? '–' : fromWei(erc1155Amount)}</span></p>
