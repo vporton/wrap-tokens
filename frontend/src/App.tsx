@@ -1,4 +1,4 @@
-import React, { useState, isValidElement, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Route,
   NavLink,
@@ -40,7 +40,7 @@ const CHAINS: { [id: string] : string } = {
 }
 
 let _web3Provider: any = null;
-let _web3Modal: any = null;
+// let _web3Modal: any = null;
 
 // async function myWeb3Modal() {
 //   if (_web3Modal) {
@@ -164,10 +164,9 @@ function App() {
   // FIXME: returns Promise?
   async function mySend(contract: string, method: any, args: Array<any>, sendArgs: any, handler: any): Promise<any> {
     sendArgs = sendArgs || {}
-    const web3 = await getWeb3();
     const account = (await getAccounts())[0];
-    return method.bind(contract)(...args).estimateGas({gas: '1000000', from: account, ...sendArgs}).
-        then((estimatedGas: string) => {
+    return method.bind(contract)(...args).estimateGas({gas: '1000000', from: account, ...sendArgs})
+        .then((estimatedGas: string) => {
             const gas = String(Math.floor(Number(estimatedGas) * 1.15) + 24000);
             if(handler !== null)
                 return method.bind(contract)(...args).send({gas, from: account, ...sendArgs}, handler);
@@ -177,9 +176,9 @@ function App() {
   }
   
   function Erc20ToERC1155() {
-    const [erc20Contract, _setErc20Contract] = useState('');
-    const [erc1155Token, _setErc1155Token] = useState('');
-    const [lockerContract, _setLockerContract] = useState('');
+    const [erc20Contract, setErc20Contract] = useState('');
+    const [erc1155Token, setErc1155Token] = useState('');
+    const [lockerContract, setLockerContract] = useState('');
     const [wrapperContract, setWrapperContract] = useState('');
     const [erc20Amount, setErc20Amount] = useState('');
     const [erc20Symbol, setErc20Symbol] = useState('');
@@ -208,10 +207,10 @@ function App() {
         const abi = (await getABIs()).ERC1155LockedERC20;
         const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
         myEvents[0] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
-          return await loadLockedIn1155(lockerContract, erc1155Token);
+          return await loadLockedIn1155();
         });
         myEvents[1] = erc1155.events.TransferBatch({filter: {_to: account}}, async () => {
-          return await loadLockedIn1155(lockerContract, erc1155Token);
+          return await loadLockedIn1155();
         });
       }
       if (isAddressValid(erc20Contract)) {
@@ -219,15 +218,15 @@ function App() {
         const erc20 = new (web3 as any).eth.Contract(abi, erc20Contract);
         // TODO: Don't reload token symbol.
         myEvents[2] = erc20.events.Transfer({filter: {to: account}}, async () => {
-          return await loadErc20(erc20Contract);
+          return await loadErc20();
         });
         myEvents[3] = erc20.events.Transfer({filter: {from: account}}, async () => {
-          return await loadErc20(erc20Contract);
+          return await loadErc20();
         });
   
         // TODO: Don't reload token symbol.
         myEvents[4] = erc20.events.Approval({filter: {owner: account, spender: wrapperContract}}, async () => {
-          return await checkErc1155WrapperApproved(erc20Contract);
+          return await checkErc1155WrapperApproved();
         });
       }
     }
@@ -242,58 +241,76 @@ function App() {
             setWrapperContract(addresses.ERC1155OverERC20.address);
           }
         });
-        await loadLockedIn1155(lockerContract, erc1155Token);
-        await loadErc20(erc20Contract);
+        await loadLockedIn1155();
+        await loadErc20();
       });
   
       (window as any).ethereum.on('accountsChanged', async function (accounts: Array<string>) {
         if (isAddressValid(erc20Contract)) {
           setConnectedToAccount(accounts.length !== 0);
-          await loadErc20(erc20Contract);
+          await loadErc20();
         }
       });
     }
-  
-    async function setErc20Contract(v: string) {
-      _setErc20Contract(v);
-      let tokenId = "";
-      if(isAddressValid(v)) {
-        tokenId = toBN(v).toString();
-        _setErc1155Token(tokenId);
-      } else {
-        _setErc1155Token("");
+
+    useEffect(() => {
+      async function fetchData() {
+        await checkErc1155WrapperApproved();
       }
-      await loadErc20(v);
-      await loadLockedIn1155(lockerContract, tokenId);
-      await connectEvents(v, lockerContract, tokenId);
-      await checkErc1155WrapperApproved(v);
-    }
-  
-    async function setErc1155Token(v: string) {
-      _setErc1155Token(v);
-      if(isWrappedTokenValid(v)) {
-        const hex = Web3.utils.toHex(v);
-        const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
-        const checksumed = Web3.utils.toChecksumAddress(addr);
-        _setErc20Contract(checksumed);
-        await loadErc20(checksumed);
-        await checkErc1155WrapperApproved(checksumed);
-        await connectEvents(checksumed, lockerContract, v);
-      } else {
-        _setErc20Contract("");
-        await loadErc20("");
-        await checkErc1155WrapperApproved("");
-        await connectEvents(erc20Contract, lockerContract, v);
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc1155WrapperApproved]);
+
+    useEffect(() => {
+      async function fetchData() {
+        let tokenId = "";
+        if(isAddressValid(erc20Contract)) {
+          tokenId = toBN(erc20Contract).toString();
+          setErc1155Token(tokenId);
+        } else {
+          setErc1155Token("");
+        }
+        await loadErc20();
+        await checkErc1155WrapperApproved();
       }
-      await loadLockedIn1155(lockerContract, v);
-    }
-  
-    async function loadErc20(_erc20Contract: string) {
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc20Contract]);
+
+    useEffect(() => {
+      async function fetchData() {
+        if(isWrappedTokenValid(erc1155Token)) {
+          const hex = Web3.utils.toHex(erc1155Token);
+          const addr = hex.replace(/^0x/, '0x' + '0'.repeat(42 - hex.length))
+          const checksumed = Web3.utils.toChecksumAddress(addr);
+          setErc20Contract(checksumed);
+        } else {
+          setErc20Contract("");
+        }
+        await loadLockedIn1155();
+      }
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc1155Token]);
+
+    useEffect(() => {
+      async function connect() {
+        await connectEvents(erc20Contract, lockerContract, erc1155Token);
+      }
+
+      connect();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc20Contract, lockerContract, erc1155Token]);
+
+    async function loadErc20() {
       // TODO: Don't call functions repeatedly.
-      if (isAddressValid(_erc20Contract)) {
+      if (isAddressValid(erc20Contract)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
-          const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, _erc20Contract);
+          const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, erc20Contract);
           const account = (await getAccounts())[0];
           if(!account) {
             setConnectedToAccount(false);
@@ -325,22 +342,22 @@ function App() {
       }
     }
   
-    async function loadLockedIn1155(_lockerContract: string, _erc1155Token: string) {
+    async function loadLockedIn1155() {
       // TODO: Don't call functions repeatedly.
-      if (isAddressValid(_lockerContract) && isWrappedTokenValid(_erc1155Token)) {
+      if (isAddressValid(lockerContract) && isWrappedTokenValid(erc1155Token)) {
         const abi = (await getABIs()).ERC1155LockedERC20;
         if (abi) {
           const web3 = await getWeb3();
           if (web3 !== null) {
-            const erc1155 = new (web3 as any).eth.Contract(abi as any, _lockerContract);
+            const erc1155 = new (web3 as any).eth.Contract(abi as any, lockerContract);
             const account = (await getAccounts())[0];
             if(!account) {
               setConnectedToAccount(false);
               return;
             }
     
-            if (isWrappedTokenValid(_erc1155Token)) {
-              erc1155.methods.balanceOf(account, _erc1155Token).call()
+            if (isWrappedTokenValid(erc1155Token)) {
+              erc1155.methods.balanceOf(account, erc1155Token).call()
                 .then((balance: string) => {
                   setLockedErc1155Amount(balance);
                 })
@@ -359,8 +376,8 @@ function App() {
       }
     }
 
-    async function checkErc1155WrapperApproved(_erc1155Contract: string) {
-      if (isAddressValid(_erc1155Contract)) {
+    async function checkErc1155WrapperApproved() {
+      if (isAddressValid(wrapperContract)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
           const account = (await getAccounts())[0];
@@ -369,7 +386,7 @@ function App() {
             return;
           }
           try {
-            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, _erc1155Contract);
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, wrapperContract);
             const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract).call();
             setErc1155WrapperApproved(approved);
           }
@@ -384,11 +401,15 @@ function App() {
       }
     }
   
-    async function setLockerContract(v: string) {
-      _setLockerContract(v);
-      await loadLockedIn1155(v, erc1155Token);
-    }
-  
+    useEffect(() => {
+      async function fetchData() {
+        await loadLockedIn1155();
+      }
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lockerContract]);
+
     // Without this does not load on Chromium, when coming by an external link:
     getAddresses().then((addresses) => {
       if (addresses) {
@@ -532,24 +553,13 @@ function App() {
   }
 
   function Erc1155ToERC20() {
-    const [erc1155Contract, _setErc1155Contract] = useState('');
-    const [erc1155Token2, _setErc1155Token2] = useState('');
+    const [erc1155Contract, setErc1155Contract] = useState('');
+    const [erc1155Token2, setErc1155Token2] = useState('');
     const [erc20WrapperApproved, setErc20WrapperApproved] = useState(false);
-    const [wrapperContract2, _setWrapperContract2] = useState('');
-    const [lockerContract2, _setLockerContract2] = useState('');
+    const [wrapperContract2, setWrapperContract2] = useState('');
+    const [lockerContract2, setLockerContract2] = useState('');
     const [erc1155Amount, setErc1155Amount] = useState('');
     const [lockedErc20Amount, setLockedErc20Amount] = useState('');
-
-    let wrapperContract2Value = "";
-
-    function setWrapperContract2(v: string) {
-      wrapperContract2Value = v;
-      _setWrapperContract2(v);
-    }
-
-    function setLockerContract2(v: string) {
-      _setLockerContract2(v);
-    }
 
     async function approveErc20Wrapper() {
       if (isAddressValid(erc1155Contract) && wrapperContract2 !== "") {
@@ -576,7 +586,7 @@ function App() {
       }
     }
 
-    async function loadRegistered(erc1155Contract: string, erc1155Token2: string) {
+    async function loadRegistered() {
       if (isAddressValid(erc1155Contract) && isUint256Valid(erc1155Token2)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
@@ -589,45 +599,38 @@ function App() {
           const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
           setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
           if (address2 !== '') {
-            await loadLockedIn20(address2);
+            await loadLockedIn20();
           }
         }
       }
     }
 
-    // TODO: parallel loading
-    async function setErc1155Contract(v: string) {
-      _setErc1155Contract(v);
-      await loadRegistered(v, erc1155Token2);
-      await loadErc1155(v, erc1155Token2);
-      await loadLockedIn20(lockerContract2);
-      // await connectEvents(v, lockerContract, tokenId); // FIXME
-      await checkErc20WrapperApproved(v, wrapperContract2Value);
-    }
+    useEffect(() => {
+      async function fetchData() {
+        await loadRegistered();
+        await loadErc1155();
+        await loadLockedIn20();
+        await connectEvents();
+        await checkErc20WrapperApproved();
+      }
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc1155Contract, erc1155Token2]);
   
-    // TODO: parallel loading
-    async function setErc1155Token2(v: string) {
-      _setErc1155Token2(v);
-      await loadRegistered(erc1155Contract, v);
-      await loadErc1155(erc1155Contract, v);
-      await loadLockedIn20(lockerContract2);
-      // await connectEvents(v, lockerContract, tokenId); // FIXME
-      await checkErc20WrapperApproved(erc1155Contract, wrapperContract2Value);
-    }
-  
-    async function loadErc1155(_erc1155Contract: string, _tokenId: string) {
+    async function loadErc1155() {
       // TODO: Don't call functions repeatedly.
-      if (isAddressValid(_erc1155Contract) && isUint256Valid(_tokenId)) {
+      if (isAddressValid(erc1155Contract) && isUint256Valid(erc1155Token2)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
-          const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, _erc1155Contract);
+          const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, erc1155Contract);
           const account = (await getAccounts())[0];
           if(!account) {
             setConnectedToAccount(false);
             return;
           }
         
-          erc1155.methods.balanceOf(account, _tokenId).call()
+          erc1155.methods.balanceOf(account, erc1155Token2).call()
             .then((balance: string) => {
               setErc1155Amount(balance);
             })
@@ -642,14 +645,14 @@ function App() {
       }
     }
   
-    async function loadLockedIn20(_lockerContract: string) {
+    async function loadLockedIn20() {
       // TODO: Don't call functions repeatedly.
-      if (isAddressValid(_lockerContract)) {
+      if (isAddressValid(lockerContract2)) {
         const abi = (await getABIs()).ERC20LockedERC1155;
         if (abi) {
           const web3 = await getWeb3();
           if (web3 !== null) {
-            const erc20 = new (web3 as any).eth.Contract(abi as any, _lockerContract);
+            const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
             const account = (await getAccounts())[0];
             if(!account) {
               setConnectedToAccount(false);
@@ -672,8 +675,8 @@ function App() {
       }
     }
   
-    async function checkErc20WrapperApproved(_erc1155Contract: string, wrapperContract2: string) {
-      if (isAddressValid(_erc1155Contract) && wrapperContract2 !== '') {
+    async function checkErc20WrapperApproved() {
+      if (isAddressValid(erc1155Contract) && wrapperContract2 !== '') {
         const web3 = await getWeb3();
         if (web3 !== null) {
           const account = (await getAccounts())[0];
@@ -682,7 +685,7 @@ function App() {
             return;
           }
           try {
-            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, _erc1155Contract);
+            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, erc1155Contract);
             const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract2).call();
             setErc20WrapperApproved(approved);
           }
@@ -733,46 +736,43 @@ function App() {
       /*const receipt =*/ await tx;
       const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
       setLockerContract2(address);
-      await loadLockedIn20(address);
+      await loadLockedIn20();
     }
 
     let myEvents = [null, null, null, null];
     
     // TODO: Connect two contracts separately.
-    async function connectEvents(erc1155Contract: string, erc1155Token: string, lockerContract: string) {
-      console.log('connectEvents')
+    async function connectEvents() {
+      console.log('connectEvents2')
       // for (let ev of myEvents) {
       //   if(ev) (ev as any).unsubscribe();
       // }
       
-      if(!isAddressValid(erc1155Contract) || isUint256Valid(erc1155Token2)) {
-        return;
-      }
       const web3 = await getWeb3();
       if(web3 === null) return;
       web3.eth.clearSubscriptions(); // FIXME: clears also the other page!
       const account = (await getAccounts())[0];
       if(!account) return;
-      if (isAddressValid(lockerContract)) {
+      if (isAddressValid(lockerContract2)) {
         const abi = (await getABIs()).ERC20LockedERC1155;
-        const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract);
+        const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
         myEvents[0] = erc20.events.Transfer({filter: {to: account}}, async () => {
-          return await loadLockedIn20(lockerContract);
+          return await loadLockedIn20();
         });
       }
       {
         const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
         // TODO: Don't reload token symbol.
         myEvents[1] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
-          return await loadErc1155(erc1155Contract, erc1155Token2);
+          return await loadErc1155();
         });
         myEvents[2] = erc1155.events.TransferSingle({filter: {_from: account}}, async () => {
-          return await loadErc1155(erc1155Contract, erc1155Token2);
+          return await loadErc1155();
         });
   
         // TODO: Don't reload token symbol.
         myEvents[3] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
-          // return await checkErc20WrapperApproved(erc1155Contract); // FIXME
+          return await checkErc20WrapperApproved(); // FIXME
         });
       }
     }
