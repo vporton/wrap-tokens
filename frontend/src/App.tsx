@@ -755,7 +755,7 @@ function App() {
   
         // TODO: Don't reload token symbol.
         myEvents[4] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
-          return await checkErc20WrapperApproved(); // FIXME
+          return await checkErc20WrapperApproved();
         });
       }
       catch(_) { }
