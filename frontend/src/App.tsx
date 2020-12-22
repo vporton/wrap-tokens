@@ -590,6 +590,7 @@ function App() {
 
     useEffect(() => {
       async function fetchData() {
+        await connectEvents();
         await loadLockedIn20();
       }
 
@@ -637,7 +638,7 @@ function App() {
               setConnectedToAccount(false);
               return;
             }
-    
+
             erc20.methods.balanceOf(account).call()
               .then((balance: string) => {
                 setLockedErc20Amount(balance);
@@ -717,7 +718,7 @@ function App() {
       setLockerContract2(address);
     }
 
-    let myEvents = [null, null, null, null];
+    let myEvents = [null, null, null, null, null];
     
     // TODO: Connect two contracts separately.
     async function connectEvents() {
@@ -731,25 +732,29 @@ function App() {
       web3.eth.clearSubscriptions(); // FIXME: clears also the other page!
       const account = (await getAccounts())[0];
       if(!account) return;
+      console.log('lockerContract2', lockerContract2)
       if (isAddressValid(lockerContract2)) {
         const abi = (await getABIs()).ERC20LockedERC1155;
         const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
         myEvents[0] = erc20.events.Transfer({filter: {to: account}}, async () => {
           return await loadLockedIn20();
         });
+        myEvents[1] = erc20.events.Transfer({filter: {from: account}}, async () => {
+          return await loadLockedIn20();
+        });
       }
       try {
         const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
         // TODO: Don't reload token symbol.
-        myEvents[1] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
+        myEvents[2] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
           return await loadErc1155();
         });
-        myEvents[2] = erc1155.events.TransferSingle({filter: {_from: account}}, async () => {
+        myEvents[3] = erc1155.events.TransferSingle({filter: {_from: account}}, async () => {
           return await loadErc1155();
         });
   
         // TODO: Don't reload token symbol.
-        myEvents[3] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
+        myEvents[4] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
           return await checkErc20WrapperApproved(); // FIXME
         });
       }
@@ -770,11 +775,11 @@ function App() {
               return;
             }
             const approved = await erc1155.methods.isApprovedForAll(account, lockerContract2).call();
-            if(approved) {
-              await mySend(erc1155, erc1155.methods.setApprovedForAll, [lockerContract2, true], {from: account}, null)
+            if(!approved) {
+              await mySend(erc1155, erc1155.methods.setApprovalForAll, [lockerContract2, true], {from: account}, null)
                 // .catch(e => alert(e.message));
             }
-            await mySend(erc20, erc20.methods.borrowERC20, [erc1155Contract, erc1155Token2, toWei(amount), account, account, []], {from: account}, null)
+            await mySend(erc20, erc20.methods.borrowERC1155, [toWei(amount), account, account, []], {from: account}, null)
               .catch(e => alert(e.message));
           }
           catch(e) {
@@ -807,17 +812,18 @@ function App() {
     }
   
     async function unlockErc1155fromErc20() {
+      const abi = (await getABIs()).ERC20LockedERC1155;
       if (isAddressValid(lockerContract2)) {
         const web3 = await getWeb3();
         if (web3 !== null) {
           try {
-            const erc20 = new (web3 as any).eth.Contract(erc20Abi, lockerContract2);
+            const erc20 = new (web3 as any).eth.Contract(abi as any, lockerContract2);
             const account = (await getAccounts())[0];
             if(!account) {
               setConnectedToAccount(false);
               return;
             }
-            await mySend(erc20, erc20.methods.returnToERC1155, [erc1155Contract, erc1155Token2, toWei(amount), account], {from: account}, null)
+            await mySend(erc20, erc20.methods.returnToERC1155, [toWei(amount), account, []], {from: account}, null)
               // .catch(e => alert(e.message));
           }
           catch(e) {
