@@ -19,6 +19,7 @@ let myWeb3: any = null;
 
 // TODO: Show pending transactions.
 // TODO: Better dialog than alert()
+// TODO: Show a warning if ERC-20 address points to a non-existing contract.
 
 // TODO
 const CHAINS: { [id: string] : string } = {
@@ -260,7 +261,7 @@ function App() {
 
       fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [erc1155WrapperApproved]);
+    }, [wrapperContract]);
 
     useEffect(() => {
       async function fetchData() {
@@ -386,9 +387,11 @@ function App() {
             return;
           }
           try {
-            const erc1155 = new (web3 as any).eth.Contract(erc1155Abi as any, wrapperContract);
-            const approved = await erc1155.methods.isApprovedForAll(account, wrapperContract).call();
-            setErc1155WrapperApproved(approved);
+            const erc20 = new (web3 as any).eth.Contract(erc20Abi as any, erc20Contract);
+            const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
+            const allowance = toBN(allowanceStr);
+            const halfBig = toBN(2).pow(toBN(128));
+            setErc1155WrapperApproved(!allowance.lt(halfBig));
           }
           catch(_) {
             setErc1155WrapperApproved(false);
@@ -462,14 +465,9 @@ function App() {
               setConnectedToAccount(false);
               return;
             }
-            const allowanceStr = await erc20.methods.allowance(account, wrapperContract).call();
-            const allowance = toBN(allowanceStr);
-            const halfBig = toBN(2).pow(toBN(128));
-            if(allowance.lt(halfBig)) {
-              const big = toBN(2).pow(toBN(256)).sub(toBN(1));
-              await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
-                // .catch(e => alert(e.message));
-            }
+            const big = toBN(2).pow(toBN(256)).sub(toBN(1));
+            await mySend(erc20, erc20.methods.approve, [wrapperContract, big], {from: account}, null)
+              // .catch(e => alert(e.message));
           }
           catch(e) {
             alert(e.message);
