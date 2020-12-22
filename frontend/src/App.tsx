@@ -545,21 +545,39 @@ function App() {
 
     async function approveErc20Wrapper() {
     }
-  
+
+    async function loadRegistered(erc1155Contract: string, erc1155Token2: string) {
+      const web3 = await getWeb3();
+      if (web3 !== null) {
+        const abi = (await getABIs()).ERC20Registry;
+        const contractAddress = (await getAddresses())["ERC20Registry"].address;
+        const registry = new (web3 as any).eth.Contract(abi, contractAddress);
+
+        const address1 = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
+        setWrapperContract2(/^0x0+$/.test(address1) ? "" : address1);
+        const address2 = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
+        setLockerContract2(/^0x0+$/.test(address2) ? "" : address2);
+      }
+    }
+
+    // TODO: parallel loading
     async function setErc1155Contract(v: string) {
       _setErc1155Contract(v);
       await loadErc1155(v, erc1155Token2);
       await loadLockedIn20(lockerContract2);
       // await connectEvents(v, lockerContract, tokenId); // FIXME
       await checkErc20WrapperApproved(v);
+      await loadRegistered(v, erc1155Token2);
     }
   
+    // TODO: parallel loading
     async function setErc1155Token2(v: string) {
       _setErc1155Token2(v);
       await loadErc1155(erc1155Contract, v);
       await loadLockedIn20(lockerContract2);
       // await connectEvents(v, lockerContract, tokenId); // FIXME
       await checkErc20WrapperApproved(erc1155Contract);
+      await loadRegistered(erc1155Contract, v);
     }
   
     async function loadErc1155(_erc1155Contract: string, _tokenId: string) {
@@ -681,9 +699,10 @@ function App() {
       /*const receipt =*/ await tx;
       const address = await registry.methods.getLocker(erc1155Contract, erc1155Token2).call();
       setLockerContract2(address);
+      await loadLockedIn20(address);
     }
 
-    let myEvents = [null, null, null, null, null];
+    let myEvents = [null, null, null, null];
     
     // TODO: Connect two contracts separately.
     async function connectEvents(erc1155Contract: string, erc1155Token: string, lockerContract: string) {
@@ -710,15 +729,15 @@ function App() {
       {
         const erc1155 = new (web3 as any).eth.Contract(erc1155Abi, erc1155Contract);
         // TODO: Don't reload token symbol.
-        myEvents[2] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
+        myEvents[1] = erc1155.events.TransferSingle({filter: {_to: account}}, async () => {
           return await loadErc1155(erc1155Contract, erc1155Token2);
         });
-        myEvents[3] = erc1155.events.TransferSingle({filter: {_from: account}}, async () => {
+        myEvents[2] = erc1155.events.TransferSingle({filter: {_from: account}}, async () => {
           return await loadErc1155(erc1155Contract, erc1155Token2);
         });
   
         // TODO: Don't reload token symbol.
-        myEvents[4] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
+        myEvents[3] = erc1155.events.ApprovalForAll({filter: {account: account, operator: wrapperContract2}}, async () => {
           // return await checkErc1155WrapperApproved(erc1155Contract); // FIXME
         });
       }
