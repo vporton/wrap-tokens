@@ -579,12 +579,20 @@ function App() {
         await loadRegistered();
         await loadErc1155();
         await connectEvents();
-        await checkErc20WrapperApproved();
       }
 
       fetchData();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [erc1155Contract, erc1155Token2]);
+
+    useEffect(() => {
+      async function fetchData() {
+        await checkErc20WrapperApproved();
+      }
+
+      fetchData();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [erc1155Contract, wrapperContract2]);
 
     useEffect(() => {
       async function fetchData() {
