@@ -13,8 +13,6 @@ import erc20Abi from './ERC20Abi';
 import erc1155Abi from './ERC1155Abi';
 const { toBN, fromWei, toWei } = Web3.utils;
 
-// TODO: This code is messy.
-
 let myWeb3: any = null;
 
 // TODO: Show pending transactions.
@@ -895,7 +893,6 @@ function App() {
     );
   }
 
-  // TODO: <script> should be in <head>. // TODO: Google Analytics does not work.
   return (
     <HashRouter>
       <div className="App">
