@@ -80,8 +80,12 @@ module.exports = {
     },
     'mumbai': {
       url: "https://rpc-mumbai.matic.today",
-      accounts: process.env.RINKEBY_PRIVATE_KEY ? [process.env.RINKEBY_PRIVATE_KEY] : [],
+      accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
     },
+    'moonbasealpha': {
+      url: "https://rpc.testnet.moonbeam.network",
+      accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
+    }
   },
   namedAccounts: {
     deployer: {
