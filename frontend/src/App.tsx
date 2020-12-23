@@ -915,7 +915,7 @@ function App() {
               {' '}|{' '}
               <a href="https://portonvictor.org">Author</a>
               {' '}|{' '}
-              <a href="https://gitcoin.co/grants/1591/science-of-the-future">Donate</a>
+              <a href="https://gitcoin.co/grants/1865/convert-erc-1155-erc-20-need-021224376-eth">Donate</a>
             </small>
           </p>
           <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
