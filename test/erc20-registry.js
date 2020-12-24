@@ -12,8 +12,16 @@ describe("ERC20Registry", function() {
     this.token1 = 123;
     this.token2 = 321;
 
+    const ERC20OverERC1155 = await ethers.getContractFactory("ERC20OverERC1155");
+    const erc20OverErc1155 = await ERC20OverERC1155.deploy();
+    await erc20OverErc1155.deployed();
+
+    const ERC20LockedERC1155 = await ethers.getContractFactory("ERC20LockedERC1155");
+    const erc20LockedErc1155 = await ERC20LockedERC1155.deploy();
+    await erc20LockedErc1155.deployed();
+
     const Registry = await ethers.getContractFactory("ERC20Registry");
-    this.registry = await Registry.deploy();
+    this.registry = await Registry.deploy(erc20OverErc1155.address, erc20LockedErc1155.address);
     await this.registry.deployed();
 
     const ERC1155 = await ethers.getContractFactory("ERC1155Mock");

@@ -13,7 +13,6 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.3.0",
     "@symfoni/hardhat-react": "^0.1.6",
-    "argent-contracts": "git+ssh://git@github.com/argentlabs/argent-contracts.git#bad61b6f",
     "chai-bignumber": "^3.0.0",
     "eslint": "^7.11.0",
     "hardhat": "^2.0.5",
