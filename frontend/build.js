@@ -17,7 +17,13 @@ const inhead = `
 </script>
 `;
 
+const bodyend = `
+<!-- Go to www.addthis.com/dashboard to customize your tools -->
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5fe51e96906ed44b"></script>
+`;
+
 const indexFileName = "build/index.html";
 let index = fs.readFileSync(indexFileName, {encoding: 'utf-8'});
 index = index.replace("<head>", "<head>" + inhead);
+index = index.replace("</body>", bodyend + "</body>");
 fs.writeFileSync(indexFileName, index);
