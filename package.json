@@ -11,7 +11,6 @@
     "export": "npx hardhat export-artifacts tmp && npx hardhat run scripts/export-bytecode.js && rm -rf tmp"
   },
   "dependencies": {
-    "@myetherwallet/mewconnect-web-client": "^2.1.16",
     "@openzeppelin/contracts": "^3.3.0",
     "@symfoni/hardhat-react": "^0.1.6",
     "argent-contracts": "git+ssh://git@github.com/argentlabs/argent-contracts.git#bad61b6f",
