@@ -1,4 +1,3 @@
-* FIXME: Wrapper contracts need to be able to approve somebody. Test this thoroughly.
 * audit
 * ERC1155LockedERC721
 * ERC1155OverERC721
