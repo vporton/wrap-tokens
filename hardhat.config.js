@@ -24,7 +24,7 @@ task("accounts", "Prints the list of accounts", async () => {
  */
 module.exports = {
   solidity: {
-    version: "0.7.5",
+    version: "0.7.6",
     settings: {
       optimizer: {
         enabled: true,
@@ -85,7 +85,12 @@ module.exports = {
     'moonbasealpha': {
       url: "https://rpc.testnet.moonbeam.network",
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
-    }
+    },
+    rinkeby: {
+      url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_KEY,
+      accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
+    },
+
   },
   namedAccounts: {
     deployer: {
