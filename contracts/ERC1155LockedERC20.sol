@@ -6,6 +6,7 @@ import "./ERC1155.sol";
 import "./IERC1155Views.sol";
 import "./IMyERC20.sol";
 
+// FIXME: Redeploy this contract.
 contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     // solhint-disable func-visibility
     constructor (string memory uri_) ERC1155(uri_) {
@@ -13,14 +14,14 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
     // solhint-enable func-visibility
 
     function borrowERC20(IMyERC20 erc20, uint256 _amount, address _from, address _to, bytes calldata _data) public {
-        require(erc20.transferFrom(_from, address(this), _amount), "Cannot transfer.");
         _mint(_to, uint256(address(erc20)), _amount, _data);
+        require(erc20.transferFrom(_from, address(this), _amount), "Cannot transfer.");
         emit BorrowedERC20(erc20, msg.sender, _amount, _from, _to, _data);
     }
 
     function returnToERC20(IMyERC20 erc20, uint256 _amount, address _to) public {
-        require(erc20.transfer(_to, _amount), "Cannot transfer.");
         _burn(msg.sender, uint256(address(erc20)), _amount);
+        require(erc20.transfer(_to, _amount), "Cannot transfer.");
         emit ReturnedToERC20(erc20, _amount, msg.sender, _to);
     }
 

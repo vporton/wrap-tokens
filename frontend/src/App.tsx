@@ -697,7 +697,16 @@ function App() {
           {' '}
           <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
           <br/>
-          <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
+          <span style={{color: 'red'}}>
+            (Be sure to use only trustworthy locker contracts!)
+            <br/>
+            <strong>
+              Don't use this locker contract! It has a security bug.
+              {' '}
+              Wrapper contracts are not affected.
+            </strong>
+          </span>
+        </p>
         <p>Amount on ERC-20:
           {' '}
           <span>{erc20Amount === '' ? '–' : fromWei(erc20Amount)}</span>

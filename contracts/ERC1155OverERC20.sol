@@ -7,6 +7,8 @@ import "./IERC1155Views.sol";
 import "./IMyERC20.sol";
 
 // This contract has a bug: It does not emit ERC-1155 events.
+//
+// FIXME: Redeploy this contract!
 contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
     // using SafeMath for uint256;
 
@@ -112,7 +114,6 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
         require(from == msg.sender || _operatorApprovals[from][msg.sender], "ERC1155: caller is not owner nor approved");
 
         for (uint i = 0; i < ids.length; ++i) {
-            IMyERC20(ids[i]).approve(from, ~uint256(0));
             require(IMyERC20(ids[i]).transferFrom(from, to, amounts[i]));
         }
     }

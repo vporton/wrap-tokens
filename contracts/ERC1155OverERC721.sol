@@ -3,12 +3,9 @@ pragma solidity ^0.7.1;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Metadata.sol";
 import "./ERC1155.sol";
 import "./IERC1155Views.sol";
-
-interface IMyERC721 is IERC721, IERC721Metadata { }
+import "./IMyERC721.sol";
 
 // This contract has a bug: It does not emit ERC-1155 events.
 contract ERC1155OverERC721 is Context, ERC165, IERC1155, IERC1155Views {
@@ -53,8 +50,10 @@ contract ERC1155OverERC721 is Context, ERC165, IERC1155, IERC1155Views {
     // solhint-enable func-visibility
 
     function registerERC721Token(ERC721Token calldata erc721token) public {
-        tokens[_tokenHash(erc721token)] = erc721token;
-        emit RegisterToken(erc721token);
+        if (address(tokens[_tokenHash(erc721token)].erc721Contract) != address(0)) {
+            tokens[_tokenHash(erc721token)] = erc721token;
+            emit RegisterToken(erc721token);
+        }
     }
 
     // It gives a wrong value for non-registered token, but that doesn't matter.
