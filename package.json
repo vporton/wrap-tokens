@@ -1,6 +1,6 @@
 {
   "name": "@vporton/wrap-tokens",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Wrap/lock different kinds of Ethereum tokens in other tokens",
   "main": "index.js",
   "repository": "git@github.com:vporton/wrap-tokens.git",

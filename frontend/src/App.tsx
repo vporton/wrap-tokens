@@ -141,7 +141,7 @@ function App() {
     catch(_) { }
     const web3 = await baseGetWeb3();
     getAccounts().then((accounts) => {
-      setConnectedToAccount(accounts.length !== 0);
+      setConnectedToAccount(accounts && accounts.length !== 0);
     });
     return web3;
   }
