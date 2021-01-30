@@ -210,7 +210,7 @@ function App() {
         // TODO: hacky code
         // TODO: duplicate code
         await getAddresses().then((addresses) => {
-          if (addresses) {
+          if (addresses && addresses.ERC1155LockedETH) {
             setLockerContract(addresses.ERC1155LockedETH.address);
           }
         });
@@ -272,7 +272,7 @@ function App() {
 
     // Without this does not load on Chromium, when coming by an external link:
     getAddresses().then((addresses) => {
-      if (addresses) {
+      if (addresses && addresses.ERC1155LockedETH) { // FIXME: It does not work on mainnet
         setLockerContract(addresses.ERC1155LockedETH.address);
       }
     });
@@ -1048,6 +1048,7 @@ function App() {
           <Uint256 value={erc1155Token2}
                    onChange={async (e: Event) => await setErc1155Token2((e.target as HTMLInputElement).value as string)}/>
         </p>
+        <p><strong style={{color: 'red'}}>Don't use this, especially the locker, because it has a security bug!</strong></p>
         <p>Wrapper contract:
           {' '}
           <code className="address">{wrapperContract2}</code>
