@@ -40,6 +40,7 @@ describe("ERC1155LockedERC20", function() {
     await this.erc20Mock.connect(this.user3).approve(this.wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
     this.wrapper.connect(this.user3).borrowERC20(this.erc20Mock.address, parseEther("1000"), this.user3.address, this.user1.address, []);
     await this.erc20Mock2.connect(this.user3).approve(this.wrapper.address, BigNumber.from(2).pow(BigNumber.from(256)).sub(BigNumber.from(1)));
+    expect(await this.wrapper.totalSupply(this.erc20Mock.address)).to.equal(parseEther("1000"));
     this.wrapper.connect(this.user3).borrowERC20(this.erc20Mock2.address, parseEther("2000"), this.user3.address, this.user1.address, []);
     expect(await this.erc20Mock.balanceOf(this.user1.address)).to.equal(parseEther("0"));
     expect(await this.wrapper.balanceOf(this.user1.address, this.erc20Mock.address)).to.equal(parseEther("1000"));
@@ -67,6 +68,7 @@ describe("ERC1155LockedERC20", function() {
     expect(await this.wrapper.balanceOf(this.user2.address, this.erc20Mock.address)).to.equal(parseEther("400"));
 
     this.wrapper.connect(this.user1).returnToERC20(this.erc20Mock.address, parseEther("600"), this.user3.address);
+    expect(await this.wrapper.totalSupply(this.erc20Mock.address)).to.equal(parseEther("400"));
     expect(await this.erc20Mock.balanceOf(this.user3.address)).to.equal(parseEther("600"));
   });
 
