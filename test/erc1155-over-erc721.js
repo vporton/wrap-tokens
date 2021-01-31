@@ -1,6 +1,9 @@
 const chai = require("chai");
+const { BigNumber } = ethers;
 const { compositeTokenHash } = require('../lib/tokens-ethers.js');
+
 const { expect } = chai;
+const { from: toBN } = BigNumber;
 
 chai.use(require('chai-as-promised'))
 
@@ -26,7 +29,7 @@ describe("ERC1155OverERC721", function() {
   let erc1155TokenId2;
 
   beforeEach(async function() {
-    [this.deployer, this.user1, this.user2, this.user3] = await ethers.getSigners();
+    [this.deployer, this.user1, this.user2, this.user3, this.user4] = await ethers.getSigners();
 
     const ERC721Mock = await ethers.getContractFactory("ERC721Mock");
     this.erc721Mock1 = await ERC721Mock.deploy();
@@ -40,8 +43,13 @@ describe("ERC1155OverERC721", function() {
     this.wrapper = await ERC1155OverERC721.deploy("https://example.com");
     await this.wrapper.deployed();
 
-    await this.erc721Mock1.connect(this.user1).approve(this.wrapper.address, erc721TokenId1);
-    await this.erc721Mock2.connect(this.user1).approve(this.wrapper.address, erc721TokenId2);
+    // Some of the following approvals may be superfluous. It does not matter.
+    await this.erc721Mock1.connect(this.user1).setApprovalForAll(this.wrapper.address, true);
+    await this.erc721Mock1.connect(this.user2).setApprovalForAll(this.wrapper.address, true);
+    await this.erc721Mock1.connect(this.user3).setApprovalForAll(this.wrapper.address, true);
+    await this.erc721Mock2.connect(this.user1).setApprovalForAll(this.wrapper.address, true);
+    await this.erc721Mock2.connect(this.user2).setApprovalForAll(this.wrapper.address, true);
+    await this.erc721Mock2.connect(this.user3).setApprovalForAll(this.wrapper.address, true);
 
     const self = this;
     async function registerToken(erc721Contract, erc721TokenId) {
@@ -72,64 +80,78 @@ describe("ERC1155OverERC721", function() {
       1,
       []
     );
-    return;
 
-    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.wrapper.balanceOf(this.user1.address, this.erc721Mock1.address)).to.equal(1);
+    expect(await this.wrapper.balanceOf(this.user1.address, erc1155TokenId1)).to.equal(0);
     expect(await this.erc721Mock1.balanceOf(this.user2.address)).to.equal(1);
-    expect(await this.wrapper.balanceOf(this.user2.address, this.erc721Mock1.address)).to.equal(1);
-
+    expect(await this.wrapper.balanceOf(this.user2.address, erc1155TokenId1)).to.equal(1);
+    
     const self = this;
     {
       async function fails() {
-        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [self.erc721Mock1.address, self.erc721Mock2.address], [1, 1], []);
+        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [erc1155TokenId1, erc1155TokenId2], [1, 1], []);
       }
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: caller is not owner nor approved");
     }
     expect(await this.wrapper.connect(this.user1).isApprovedForAll(this.user1.address, this.user3.address)).to.be.equal(false);
     await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
     expect(await this.wrapper.connect(this.user1).isApprovedForAll(this.user1.address, this.user3.address)).to.be.equal(true);
-    await this.wrapper.connect(this.user3).safeTransferFrom(this.user1.address, this.user2.address, this.erc721Mock1.address, 1, []);
-    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.wrapper.balanceOf(this.user1.address, this.erc721Mock1.address)).to.equal(1);
     expect(await this.erc721Mock1.balanceOf(this.user2.address)).to.equal(1);
-    expect(await this.wrapper.balanceOf(this.user2.address, this.erc721Mock1.address)).to.equal(1);
+    await this.wrapper.connect(this.user2).setApprovalForAll(this.user1.address, true); // needed?
+    await this.wrapper.connect(this.user1).safeTransferFrom(this.user2.address, this.user3.address, erc1155TokenId1, 1, []);
+    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(0);
+    expect(await this.wrapper.balanceOf(this.user1.address, erc1155TokenId1)).to.equal(0);
+    expect(await this.erc721Mock1.balanceOf(this.user3.address)).to.equal(1);
+    expect(await this.wrapper.balanceOf(this.user3.address, erc1155TokenId1)).to.equal(1);
   });
-  return;
 
   it("ERC1155 over ERC20 (batch transfers)", async function() {
     await this.wrapper.connect(this.user1).safeBatchTransferFrom(
       this.user1.address,
       this.user2.address,
-      [this.erc721Mock1.address, this.erc721Mock2.address],
+      [erc1155TokenId1, erc1155TokenId2],
       [1, 1],
       []
     );
 
     // TODO: Heterogeneous arrays in balanceOfBatch
 
-    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.erc721Mock2.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [this.erc721Mock1.address, this.erc721Mock2.address])).to.deep.equal([1, 1]);
+    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(0);
+    expect(await this.erc721Mock2.balanceOf(this.user1.address)).to.equal(0);
+    {
+      const balances = await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [erc1155TokenId1, erc1155TokenId1]);
+      expect(balances[0]).to.equal(0);
+      expect(balances[1]).to.equal(0);
+    }
     expect(await this.erc721Mock1.balanceOf(this.user2.address)).to.equal(1);
     expect(await this.erc721Mock2.balanceOf(this.user2.address)).to.equal(1);
-    expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [this.erc721Mock1.address, this.erc721Mock2.address])).to.deep.equal([1, 1]);
+    {
+      const balances = await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [erc1155TokenId1, erc1155TokenId2]);
+      expect(balances[0]).to.equal(1);
+      expect(balances[1]).to.equal(1);
+    }
 
     const self = this;
     {
       async function fails() {
-        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [self.erc721Mock1.address, self.erc721Mock2.address], [1], []);
+        await self.wrapper.connect(self.user3).safeBatchTransferFrom(self.user1.address, self.user2.address, [erc1155TokenId1, erc1155TokenId2], [1], []);
       }
       await expectThrowsAsync(fails, "VM Exception while processing transaction: revert ERC1155: ids and amounts length mismatch");
     }
-    await this.wrapper.connect(this.user1).setApprovalForAll(this.user3.address, true);
-    await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user1.address, this.user2.address, [this.erc721Mock1.address, this.erc721Mock2.address], [1, 1], []);
-    expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.erc721Mock2.balanceOf(this.user1.address)).to.equal(1);
-    expect(await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [this.erc721Mock1.address, this.erc721Mock2.address])).to.deep.equal([1, 1]);
-    expect(await this.erc721Mock1.balanceOf(this.user2.address)).to.equal(1);
-    expect(await this.erc721Mock2.balanceOf(this.user2.address)).to.equal(1);
-    expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [this.erc721Mock1.address, this.erc721Mock2.address])).to.deep.equal([1, 1]);
+    await this.wrapper.connect(this.user2).setApprovalForAll(this.user3.address, true);
+    await this.erc721Mock2.connect(this.user3).setApprovalForAll(this.wrapper.address, true);
+    // TODO
+    // await this.wrapper.connect(this.user3).safeBatchTransferFrom(this.user2.address, this.user1.address, [erc1155TokenId2/*, erc1155TokenId2*/], [1/*, 1*/], []);
+    // return
+    // expect(await this.erc721Mock1.balanceOf(this.user1.address)).to.equal(1);
+    // expect(await this.erc721Mock2.balanceOf(this.user1.address)).to.equal(1);
+    // {
+    //   const balances = await this.wrapper.balanceOfBatch([this.user1.address, this.user1.address], [erc1155TokenId2, erc1155TokenId2]);
+    //   expect(balances[0]).to.equal(1);
+    //   expect(balances[1]).to.equal(1);
+    // }
+    // expect(await this.erc721Mock1.balanceOf(this.user2.address)).to.equal(1);
+    // expect(await this.erc721Mock2.balanceOf(this.user2.address)).to.equal(1);
+    // expect(await this.wrapper.balanceOfBatch([this.user2.address, this.user2.address], [erc1155TokenId2, erc1155TokenId2])).to.deep.equal([1, 1]);
   });
 
   it("metadata", async function() {
