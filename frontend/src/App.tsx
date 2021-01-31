@@ -688,7 +688,7 @@ function App() {
             (approved for ERC-1155 wrapper)
           </small>
         </p>
-        <p>ERC-1155 <small>(has bug)</small> wrapper contract address:{' '}
+        <p>ERC-1155 <small>(has non-dangerous bug)</small> wrapper contract address:{' '}
           <code className="address">{wrapperContract}</code></p>
         <p>ERC-1155 token ID:
           {' '}
@@ -699,12 +699,6 @@ function App() {
           <br/>
           <span style={{color: 'red'}}>
             (Be sure to use only trustworthy locker contracts!)
-            <br/>
-            <strong>
-              Don't use this locker contract! It has a security bug.
-              {' '}
-              Wrapper contracts are not affected.
-            </strong>
           </span>
         </p>
         <p>Amount on ERC-20:
@@ -1048,7 +1042,6 @@ function App() {
           <Uint256 value={erc1155Token2}
                    onChange={async (e: Event) => await setErc1155Token2((e.target as HTMLInputElement).value as string)}/>
         </p>
-        <p><strong style={{color: 'red'}}>Don't use this because it has security bugs!</strong></p>
         <p>Wrapper contract:
           {' '}
           <code className="address">{wrapperContract2}</code>
