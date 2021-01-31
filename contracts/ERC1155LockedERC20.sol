@@ -24,6 +24,11 @@ contract ERC1155LockedERC20 is ERC1155FromERC20, ERC1155 {
         emit ReturnedToERC20(erc20, _amount, msg.sender, _to);
     }
 
+    // FIXME: Test.
+    function totalSupply(uint256 _id) public view override returns (uint256) {
+        return IMyERC20(address(_id)).balanceOf(address(this));
+    }
+
     function uri(uint256 /*_id*/) external view override(ERC1155, IERC1155Views) returns (string memory) {
         return _uri;
     }
