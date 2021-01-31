@@ -49,10 +49,11 @@ contract ERC1155OverERC721 is Context, ERC165, IERC1155, IERC1155Views {
     }
     // solhint-enable func-visibility
 
-    function registerERC721Token(ERC721Token calldata erc721token) public {
-        if (address(tokens[_tokenHash(erc721token)].erc721Contract) != address(0)) {
-            tokens[_tokenHash(erc721token)] = erc721token;
-            emit RegisterToken(erc721token);
+    function registerERC721Token(ERC721Token calldata _erc721token) public {
+        uint256 _hash = _tokenHash(_erc721token);
+        if (address(tokens[_hash].erc721Contract) == address(0)) {
+            tokens[_hash] = _erc721token;
+            emit RegisterToken(_erc721token);
         }
     }
 
@@ -162,7 +163,7 @@ contract ERC1155OverERC721 is Context, ERC165, IERC1155, IERC1155Views {
         }
     }
 
-    function _tokenHash(ERC721Token calldata erc721token) internal virtual returns (uint256) {
-        return uint256(keccak256(abi.encode(erc721token)));
+    function _tokenHash(ERC721Token memory erc721token) internal virtual returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(erc721token.erc721Contract, erc721token.erc721TokenId)));
     }
 }
