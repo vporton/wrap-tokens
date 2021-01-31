@@ -70,30 +70,36 @@ module.exports = {
     mainnet: {
       url: "https://mainnet.infura.io/v3/" + process.env.INFURA_KEY,
       accounts: process.env.MAINNET_PRIVATE_KEY ? [ process.env.MAINNET_PRIVATE_KEY ] : [],
+      gasPrice: 60000000000, // 60 Gwei
     },
     bsc: {
       url: "https://bsc-dataseed4.ninicoin.io:443",
       accounts: process.env.MAINNET_PRIVATE_KEY ? [ process.env.MAINNET_PRIVATE_KEY ] : [],
+      gasPrice: 25000000000, // 25 Gwei
     },
     bsctest: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       accounts: process.env.TESTNET_PRIVATE_KEY ? [ process.env.TESTNET_PRIVATE_KEY ] : [],
+      gasPrice: 25000000000, // 25 Gwei
     },
-    'matic': {
-      url: "https://rpc-mainnet.matic.network",
+    matic: {
+      url: "https://rpc-mainnet.maticvigil.com/v1/" + process.env.MATIC_KEY,
       accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
+      gasPrice: 4000000000, // 4 Gwei
     },
-    'mumbai': {
-      url: "https://rpc-mumbai.matic.today",
+    mumbai: {
+      url: "https://rpc-mumbai.maticvigil.com/v1/" + process.env.MATIC_KEY,
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
+      gasPrice: 4000000000, // 4 Gwei
     },
-    'moonbasealpha': {
+    moonbasealpha: {
       url: "https://rpc.testnet.moonbeam.network",
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
     },
     rinkeby: {
       url: "https://rinkeby.infura.io/v3/" + process.env.INFURA_KEY,
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
+      gasPrice: 25000000000, // 25 Gwei
     },
 
   },
