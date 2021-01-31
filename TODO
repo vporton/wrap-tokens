@@ -7,3 +7,5 @@
 * Reload on network change
 * Bottom part of the screen on phone bug.
 * Show how transactions are executed.
+* Show whether the MetaMask network is supported.
+
