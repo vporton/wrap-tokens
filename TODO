@@ -1,6 +1,5 @@
 * audit
-* ERC1155LockedERC721
-* ERC1155OverERC721
+* Use ERC1155LockedERC721 and ERC1155OverERC721 in UI
 * hook to `yarn export` after `hardhat compile`.
 * passing addresses as GET params (need to warn they may be malicious)
 * Bug when on "ERC20 → ERC1155" entered a wrong symbol in "ERC-1155 token ID"
