@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-const { BigNumber } = ethers;
 const { parseEther } = ethers.utils;
 
 // TODO: Duplicate code.

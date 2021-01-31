@@ -1,8 +1,5 @@
 const chai = require("chai");
 const { expect } = chai;
-const { BigNumber } = ethers;
-const { toBN } = BigNumber;
-const { provider } = ethers;
 const { parseEther } = ethers.utils;
 
 chai.use(require('chai-as-promised'))

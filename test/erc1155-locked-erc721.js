@@ -2,7 +2,6 @@ const chai = require("chai");
 const { expect } = chai;
 const { BigNumber } = ethers;
 const { compositeTokenHash } = require('../lib/tokens-ethers.js');
-const { toBN } = BigNumber;
 const { parseEther } = ethers.utils;
 
 chai.use(require('chai-as-promised'))
