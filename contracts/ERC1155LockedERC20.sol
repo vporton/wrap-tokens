@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
 import "./ERC1155FromERC20.sol";
 
-// FIXME: Redeploy this contract.
 contract ERC1155LockedERC20 is ERC1155FromERC20, ERC1155 {
     // solhint-disable func-visibility
     constructor (string memory uri_) ERC1155(uri_) {

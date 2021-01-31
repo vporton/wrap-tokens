@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155Receiver.sol";
 import './ERC20FromERC1155.sol';
 import "./ERC20NoSymbol.sol";
 
-// FIXME: Redeploy
 contract ERC20LockedERC1155 is ERC20FromERC1155, ERC20NoSymbol, ERC1155Receiver {
     /// Before calling this need to approve the ERC-1155 contract.
     function borrowERC1155(uint256 _amount, address _from, address _to, bytes calldata _data) public {

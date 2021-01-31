@@ -6,8 +6,6 @@ import "./ERC1155.sol";
 import "./ERC1155FromERC20.sol";
 
 // This contract has a bug: It does not emit ERC-1155 events.
-//
-// FIXME: Redeploy this contract!
 contract ERC1155OverERC20 is ERC1155FromERC20, Context, ERC165, IERC1155 {
     // using SafeMath for uint256;
 
