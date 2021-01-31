@@ -5,3 +5,4 @@
 * Bug when on "ERC20 → ERC1155" entered a wrong symbol in "ERC-1155 token ID"
 * More providers than MetaMask
 * Reload on network change
+* Bottom part of the screen on phone bug.
