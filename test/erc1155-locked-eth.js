@@ -100,7 +100,7 @@ describe("ERC1155LockedETH", function() {
 
   it("metadata", async function() {
     expect(await this.wrapper.name(tokenId)).to.equal("Wrapped Ether");
-    expect(await this.wrapper.symbol(tokenId)).to.equal("wETH");
+    expect(await this.wrapper.symbol(tokenId)).to.equal("ETH1155");
     expect(await this.wrapper.decimals(tokenId)).to.equal(18);
     expect(await this.wrapper.uri(tokenId)).to.equal("https://example.com");
   });

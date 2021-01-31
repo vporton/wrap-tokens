@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
 import "./IERC1155Views.sol";
 
+// TODO: Redeploy.
 contract ERC1155LockedETH is ERC1155 {
     uint256 constant tokenId = 0;
 
@@ -29,7 +30,7 @@ contract ERC1155LockedETH is ERC1155 {
     }
 
     function symbol(uint256 _id) external pure ourTokenId(_id) returns (string memory) {
-        return "wETH";
+        return "ETH1155";
     }
 
     function decimals(uint256 _id) external pure ourTokenId(_id) returns (uint8) {
