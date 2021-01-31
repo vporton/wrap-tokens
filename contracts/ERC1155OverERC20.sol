@@ -3,13 +3,12 @@ pragma solidity ^0.7.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
-import "./IERC1155Views.sol";
-import "./IMyERC20.sol";
+import "./ERC1155FromERC20.sol";
 
 // This contract has a bug: It does not emit ERC-1155 events.
 //
 // FIXME: Redeploy this contract!
-contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
+contract ERC1155OverERC20 is ERC1155FromERC20, Context, ERC165, IERC1155 {
     // using SafeMath for uint256;
 
     bytes4 private constant _INTERFACE_ID_ERC1155 = 0xd9b67a26;
@@ -44,18 +43,6 @@ contract ERC1155OverERC20 is Context, ERC165, IERC1155, IERC1155Views {
 
     function totalSupply(uint256 _id) external view override returns (uint256) {
         return IMyERC20(address(_id)).totalSupply();
-    }
-
-    function name(uint256 _id) external view override returns (string memory) {
-        return IMyERC20(address(_id)).name();
-    }
-
-    function symbol(uint256 _id) external view override returns (string memory) {
-        return IMyERC20(address(_id)).symbol();
-    }
-
-    function decimals(uint256 _id) external view override returns (uint8) {
-        return IMyERC20(address(_id)).decimals();
     }
 
     function balanceOf(address account, uint256 id) public view override returns (uint256) {

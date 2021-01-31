@@ -3,11 +3,10 @@ pragma solidity ^0.7.1;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
-import "./IERC1155Views.sol";
-import "./IMyERC20.sol";
+import "./ERC1155FromERC20.sol";
 
 // FIXME: Redeploy this contract.
-contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
+contract ERC1155LockedERC20 is ERC1155FromERC20, ERC1155 {
     // solhint-disable func-visibility
     constructor (string memory uri_) ERC1155(uri_) {
     }
@@ -25,18 +24,7 @@ contract ERC1155LockedERC20 is ERC1155, IERC1155Views {
         emit ReturnedToERC20(erc20, _amount, msg.sender, _to);
     }
 
-    function name(uint256 _id) external view override returns (string memory) {
-        return IMyERC20(address(_id)).name();
-    }
-
-    function symbol(uint256 _id) external view override returns (string memory) {
-        return IMyERC20(address(_id)).symbol();
-    }
-
-    function decimals(uint256 _id) external view override returns (uint8) {
-        return IMyERC20(address(_id)).decimals();
-    }
-
+    // FIXME
     function totalSupply(uint256 _id) public view override returns (uint256) {
         return IMyERC20(address(_id)).totalSupply();
     }
