@@ -1124,11 +1124,12 @@ function Address({...props}) {
   )
 }
 
+// FIXME: Right support for 256 and 160 bit values.
 function Uint256({...props}) {
   return (
     <span className="Uint256">
       <input type="text"
-             style={{maxWidth: '123.5em', width: '100%'}}
+             style={{maxWidth: '27em', width: '100%'}}
              maxLength={78}
              value={props.value}
              onChange={props.onChange}
