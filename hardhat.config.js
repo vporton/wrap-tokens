@@ -90,7 +90,7 @@ module.exports = {
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com/v1/" + process.env.MATIC_KEY,
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
-      gasPrice: 4000000000, // 4 Gwei
+      gasPrice: 1000000000, // 1 Gwei
     },
     moonbasealpha: {
       url: "https://rpc.testnet.moonbeam.network",
