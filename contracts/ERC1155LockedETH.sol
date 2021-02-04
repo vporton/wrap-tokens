@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./ERC1155.sol";
 import "./IERC1155Views.sol";
 
-// TODO: Redeploy.
 contract ERC1155LockedETH is ERC1155 {
     uint256 constant tokenId = 0;
 
