@@ -101,7 +101,11 @@ module.exports = {
       accounts: process.env.TESTNET_PRIVATE_KEY ? [process.env.TESTNET_PRIVATE_KEY] : [],
       gasPrice: 25000000000, // 25 Gwei
     },
-
+    xdai: {
+      url: "https://rpc.xdaichain.com/",
+      accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
+      gasPrice: 1000000000, // 1 Gwei
+    },
   },
   namedAccounts: {
     deployer: {
