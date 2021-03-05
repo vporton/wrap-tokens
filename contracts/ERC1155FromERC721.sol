@@ -16,8 +16,8 @@ abstract contract ERC1155FromERC721 is IERC1155Views {
     // ERC-1155 token ID => ERC721Token
     mapping(uint256 => ERC721Token) public tokens;
 
-    function registerERC721Token(ERC721Token calldata _erc721token) public {
-        uint256 _hash = _tokenHash(_erc721token);
+    function registerERC721Token(ERC721Token calldata _erc721token) public returns (uint256 _hash) {
+        _hash = _tokenHash(_erc721token);
         if (address(tokens[_hash].erc721Contract) == address(0)) {
             tokens[_hash] = _erc721token;
             emit RegisterToken(_erc721token);
