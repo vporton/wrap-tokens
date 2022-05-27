@@ -123,7 +123,7 @@ function App() {
       context: {
         getWeb3: () => Promise<any>,
         getABIs: () => Promise<any>,
-        getAddresses: () => Promise<any>,
+        getAddresses: () => Promise<{ERC1155LockedETH: {address: string}}>,
         getAccounts: () => Promise<Array<string>>,
         mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
       },
@@ -320,7 +320,7 @@ function App() {
       context: {
         getWeb3: () => Promise<any>,
         getABIs: () => Promise<any>,
-        getAddresses: () => Promise<any>,
+        getAddresses: () => Promise<{ERC1155LockedERC20: {address: string}, ERC1155OverERC20: {address: string}}>,
         getAccounts: () => Promise<Array<string>>,
         mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
       }
@@ -709,7 +709,7 @@ function App() {
       context: {
         getWeb3: () => Promise<any>,
         getABIs: () => Promise<any>,
-        getAddresses: () => Promise<any>,
+        getAddresses: () => Promise<{ERC20Registry: {address: string}}>,
         getAccounts: () => Promise<Array<string>>,
         mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
       },
@@ -731,7 +731,7 @@ function App() {
         const web3 = await getWeb3();
         if (web3 !== null) {
           const abi = (await getABIs()).ERC20Registry;
-          const contractAddress = (await getAddresses())["ERC20Registry"].address;
+          const contractAddress = (await getAddresses()).ERC20Registry.address;
           const registry = new (web3 as any).eth.Contract(abi, contractAddress);
 
           const address1 = await registry.methods.getWrapper(erc1155Contract, erc1155Token2).call();
@@ -858,7 +858,7 @@ function App() {
       const web3 = await getWeb3();
       const abi = (await getABIs()).ERC20Registry;
       const account = (await getAccounts())[0];
-      const contractAddress = (await getAddresses())["ERC20Registry"].address;
+      const contractAddress = (await getAddresses()).ERC20Registry.address;
       const registry = new (web3 as any).eth.Contract(abi, contractAddress);
       const tx = await mySend(
           registry,
@@ -879,7 +879,7 @@ function App() {
       const web3 = await getWeb3();
       const abi = (await getABIs()).ERC20Registry;
       const account = (await getAccounts())[0];
-      const contractAddress = (await getAddresses())["ERC20Registry"].address;
+      const contractAddress = (await getAddresses()).ERC20Registry.address;
       const registry = new (web3 as any).eth.Contract(abi, contractAddress);
       const tx = await mySend(
           registry,
