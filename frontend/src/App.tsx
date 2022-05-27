@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { createRef, useState, useEffect, RefObject } from 'react';
 import {
   Route,
   NavLink,
@@ -26,7 +26,7 @@ const CHAINS: { [id: string] : string } = {
   '4': 'rinkeby',
   '5': 'goerli',
   '42': 'kovan',
-  '1337': 'local',
+  // '1337': 'local',
   '122': 'fuse',
   '80001': 'mumbai',
   '137': 'matic',
@@ -36,6 +36,7 @@ const CHAINS: { [id: string] : string } = {
   '74': 'idchain',
   '56': 'bsc',
   '97': 'bsctest',
+  '31337': 'local',
 }
 
 let _web3Provider: any = null;
@@ -178,6 +179,7 @@ function App() {
     const [lockerContract, setLockerContract] = useState('');
     const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
     const [amount, setAmount] = useState('');
+    const [truthworthy, setTruthworthy] = useState(true);
   
     let myEvents = [null, null];
     
@@ -229,6 +231,13 @@ function App() {
 
       connect();
       // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [lockerContract]);
+
+    useEffect(() => {
+      // FIXME
+      getAddresses().then((addresses) => { // ????????????
+        setTruthworthy(addresses && lockerContract.toLowerCase() === addresses.ERC1155LockedETH.address.toLowerCase());
+      });
     }, [lockerContract]);
 
     async function loadLockedIn1155() {
@@ -321,12 +330,15 @@ function App() {
       }
     }
   
+    const truthworthyRef = createRef();
+
     return (
       <div>
         <p>ERC-1155 token ID: 0</p>
         <p>ERC-1155 locker contract address:
           {' '}
           <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
+          <span ref={truthworthyRef as RefObject<HTMLSpanElement>} style={{display: truthworthy ? 'inline' : 'none'}}>(truthworty)</span>
           <br/>
           <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
         <p>Amount locked in ERC-1155:
