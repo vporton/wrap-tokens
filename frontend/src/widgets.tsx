@@ -1,5 +1,5 @@
 import {
-    isAddressValid, isUint256Valid
+    isAddressValid, isUint256Valid, isRealNumber
 } from './common';
   
 export function Address({...props}) {
@@ -26,6 +26,18 @@ export function Uint256({...props}) {
              value={props.value}
              onChange={props.onChange}
              className={isUint256Valid(props.value) ? '' : 'error'}/>
+    </span>
+  )
+}
+
+export function Amount({...props}  ) {
+  return (
+    <span className="Amount">
+      <input type="text"
+             style={{maxWidth: '8em', width: '100%'}} /* Hack for 160 bit value */
+             value={props.value ? props.value : ""}
+             onChange={props.onChange}
+             className={isRealNumber(props.value) ? '' : 'error'}/>
     </span>
   )
 }
