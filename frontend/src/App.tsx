@@ -11,7 +11,10 @@ import Web3 from 'web3';
 // import MewConnect from '@myetherwallet/mewconnect-web-client';
 import erc20Abi from './ERC20Abi';
 import erc1155Abi from './ERC1155Abi';
-import { getChainId, isAddressValid, isUint256Valid, isWrappedTokenValid, isRealNumber, fetchOnceJson, baseGetWeb3 } from './common'
+import {
+  getChainId, isAddressValid, isUint256Valid, isWrappedTokenValid, isRealNumber, fetchOnceJson, baseGetWeb3,
+  Address, Uint256
+} from './common';
 const { toBN, fromWei, toWei } = Web3.utils;
 
 // TODO: Show pending transactions.
@@ -1062,33 +1065,6 @@ function App() {
   );
 }
 
-function Address({...props}) {
-  return (
-    <span className="Address">
-      <input type="text"
-             style={{maxWidth: '23.5em', width: '100%'}}
-             maxLength={42}
-             size={50}
-             value={props.value ? props.value : ""}
-             onChange={props.onChange}
-             className={isAddressValid(props.value) ? '' : 'error'}/>
-    </span>
-  )
-}
-
-// FIXME: Right support for 256 and 160 bit values.
-function Uint256({...props}) {
-  return (
-    <span className="Uint256">
-      <input type="text"
-             style={{maxWidth: '27em', width: '100%'}}
-             maxLength={78}
-             value={props.value}
-             onChange={props.onChange}
-             className={isUint256Valid(props.value) ? '' : 'error'}/>
-    </span>
-  )
-}
 
 function WrappedERC20({...props}) {
   return (
