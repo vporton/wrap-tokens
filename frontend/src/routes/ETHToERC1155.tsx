@@ -1,18 +1,11 @@
 import React, { createRef, useState, useEffect, RefObject } from 'react';
-import {
-  Route,
-  NavLink,
-  HashRouter
-} from "react-router-dom";
 import Web3 from 'web3';
 // MEWConnect does not work on Firefox 84.0 for Ubuntu.
 // import Web3Modal from "web3modal";
 // import MewConnect from '@myetherwallet/mewconnect-web-client';
 import erc20Abi from '../ERC20Abi';
 import erc1155Abi from '../ERC1155Abi';
-import {
-  getChainId, isAddressValid, isUint256Valid, isWrappedTokenValid, isRealNumber, fetchOnceJson, baseGetWeb3,
-} from '../common';
+import { isAddressValid, isRealNumber } from '../common';
 import { Address, Uint256, Amount } from '../widgets';
 const { toBN, fromWei, toWei } = Web3.utils;
 
