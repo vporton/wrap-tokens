@@ -118,7 +118,19 @@ function App() {
         });
   }
   
-  function ETHToERC1155() {
+  function ETHToERC1155(
+    props: {
+      context: {
+        getWeb3: () => Promise<any>,
+        getABIs: () => Promise<any>,
+        getAddresses: () => Promise<any>,
+        getAccounts: () => Promise<Array<string>>,
+        mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
+      },
+    })
+  {
+    const { getWeb3, getABIs, getAddresses, getAccounts, mySend } = props.context;
+
     const [lockerContract, setLockerContract] = useState('');
     const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
     const [amount, setAmount] = useState('');
@@ -303,7 +315,19 @@ function App() {
     );
   }
 
-  function Erc20ToERC1155() {
+  function Erc20ToERC1155(
+    props: {
+      context: {
+        getWeb3: () => Promise<any>,
+        getABIs: () => Promise<any>,
+        getAddresses: () => Promise<any>,
+        getAccounts: () => Promise<Array<string>>,
+        mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
+      }
+    })
+  {
+    const { getWeb3, getABIs, getAddresses, getAccounts, mySend } = props.context;
+
     const [erc20Contract, setErc20Contract] = useState('');
     const [erc1155Token, setErc1155Token] = useState('');
     const [lockerContract, setLockerContract] = useState('');
@@ -680,7 +704,19 @@ function App() {
     );
   }
 
-  function Erc1155ToERC20() {
+  function Erc1155ToERC20(
+    props: {
+      context: {
+        getWeb3: () => Promise<any>,
+        getABIs: () => Promise<any>,
+        getAddresses: () => Promise<any>,
+        getAccounts: () => Promise<Array<string>>,
+        mySend: (contract: string, method: any, args: Array<any>, sendArgs: any, handler: any) => Promise<any>
+      },
+    })
+  {
+    const { getWeb3, getABIs, getAddresses, getAccounts, mySend } = props.context;
+
     const [erc1155Contract, setErc1155Contract] = useState('');
     const [erc1155Token2, setErc1155Token2] = useState('');
     const [erc20WrapperApproved, setErc20WrapperApproved] = useState(false);
@@ -1033,6 +1069,8 @@ function App() {
     );
   }
 
+  const context = { getWeb3, getABIs, getAddresses, getAccounts, mySend };
+
   return (
     <HashRouter>
       <div className="App">
@@ -1055,9 +1093,15 @@ function App() {
           </p>
           <p style={{display: connectedToAccount ? 'none' : 'block', fontSize: '50%', color: 'red', fontWeight: 'bold'}}>Please connect to an Ethereum account!</p>
           <div className="content">
-            <Route exact path="/" component={ETHToERC1155}/>
-            <Route path="/erc20toErc1155" component={Erc20ToERC1155}/>
-            <Route path="/erc1155toErc20" component={Erc1155ToERC20}/>
+            <Route exact path="/">
+              <ETHToERC1155 context={context}/>
+            </Route>
+            <Route path="/erc20toErc1155">
+              <Erc20ToERC1155 context={context}/>
+            </Route>
+            <Route path="/erc1155toErc20">
+              <Erc1155ToERC20 context={context}/>
+            </Route>
           </div>
         </header>
       </div>
