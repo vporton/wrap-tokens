@@ -13,8 +13,8 @@ import erc20Abi from './ERC20Abi';
 import erc1155Abi from './ERC1155Abi';
 import {
   getChainId, isAddressValid, isUint256Valid, isWrappedTokenValid, isRealNumber, fetchOnceJson, baseGetWeb3,
-  Address, Uint256
 } from './common';
+import { Address, Uint256 } from './widgets';
 const { toBN, fromWei, toWei } = Web3.utils;
 
 // TODO: Show pending transactions.
