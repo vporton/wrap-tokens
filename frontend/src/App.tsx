@@ -11,9 +11,8 @@ import Web3 from 'web3';
 // import MewConnect from '@myetherwallet/mewconnect-web-client';
 import erc20Abi from './ERC20Abi';
 import erc1155Abi from './ERC1155Abi';
+import { getChainId, isAddressValid, isUint256Valid, isWrappedTokenValid, isRealNumber, fetchOnceJson, baseGetWeb3 } from './common'
 const { toBN, fromWei, toWei } = Web3.utils;
-
-let myWeb3: any = null;
 
 // TODO: Show pending transactions.
 // TODO: Better dialog than alert()
@@ -39,7 +38,6 @@ const CHAINS: { [id: string] : string } = {
   '31337': 'local',
 }
 
-let _web3Provider: any = null;
 // let _web3Modal: any = null;
 
 // async function myWeb3Modal() {
@@ -73,64 +71,6 @@ let _web3Provider: any = null;
 //   }
 //   return _web3Provider = (window as any).ethereum ? await (await myWeb3Modal()).connect() : null;
 // }
-
-async function baseGetWeb3() {
-  if(myWeb3) return myWeb3;
-
-  _web3Provider = Web3.givenProvider; //await getWeb3Provider();
-  return myWeb3 = _web3Provider ? new Web3(_web3Provider) : null;
-}
-
-async function getChainId(): Promise<any> { // TODO: more specific type
-  const web3 = await baseGetWeb3();
-  if (!web3) {
-    return null;
-  }
-  return await (web3 as any).eth.getChainId();
-}
-
-function isAddressValid(v: string): boolean { // TODO: called twice
-  return Web3.utils.isAddress(v);
-}
-
-function isUint256Valid(v: string): boolean { // TODO: called twice
-  return /^[0-9]+$/.test(v) && toBN(v).lt(toBN(2).pow(toBN(256)));
-}
-
-function isWrappedTokenValid(v: string): boolean { // TODO: called twice
-  return /^[0-9]+$/.test(v) && toBN(v).lt(toBN(2).pow(toBN(160)));
-}
-
-function isRealNumber(v: string): boolean { // TODO: called twice
-  return /^[0-9]+(\.[0-9]+)?$/.test(v);
-}
-
-// let _fetchedPromises = new Map<string, Promise<any>>();
-let _fetchedJsonPromises = new Map<string, Promise<any>>();
-let _fetched = new Map<string, any>();
-
-async function fetchOnceJsonPromise(url: string): Promise<Promise<any>> {
-  let promise = _fetchedJsonPromises.get(url);
-  if (promise) {
-    return promise;
-  } else {
-    const fetchResult = await fetch(url);
-    promise = fetchResult.json() as Promise<any>;
-    _fetchedJsonPromises.set(url, promise);
-    return await promise;
-  }
-}
-
-async function fetchOnceJson(url: string): Promise<any> {
-  let json = _fetched.get(url);
-  if (json) {
-    return json;
-  } else {
-    json = await fetchOnceJsonPromise(url);
-    _fetched.set(url, json);
-    return json;
-  }
-}
 
 function App() {
   const [connectedToAccount, setConnectedToAccount] = useState(true); // Don't show the message by default.
