@@ -1,4 +1,4 @@
-import React, { createRef, useState, useEffect, RefObject } from 'react';
+import React, { createRef, useState, useEffect, RefObject, ChangeEvent } from 'react';
 import Web3 from 'web3';
 // MEWConnect does not work on Firefox 84.0 for Ubuntu.
 // import Web3Modal from "web3modal";
@@ -189,7 +189,7 @@ export default function ETHToERC1155(
       <p>ERC-1155 token ID: 0</p>
       <p>ERC-1155 locker contract address:
         {' '}
-        <Address value={lockerContract} onChange={(e: Event) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
+        <Address value={lockerContract} onChange={(e: ChangeEvent<HTMLInputElement>) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
         <span ref={truthworthyRef as RefObject<HTMLSpanElement>} style={{display: truthworthy ? 'inline' : 'none'}}>(truthworty)</span>
         <br/>
         <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
