@@ -28,6 +28,7 @@ export default function ETHToERC1155(
 {
   const { getWeb3, getABIs, getAddresses, getAccounts, mySend, connectedToAccount, setConnectedToAccount } = props.context;
 
+  const [originalLockerContract, setOriginalLockerContract] = useState('');
   const [lockerContract, setLockerContract] = useState('');
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
   const [amount, setAmount] = useState('');
@@ -65,6 +66,8 @@ export default function ETHToERC1155(
       // TODO: duplicate code
       await getAddresses().then((addresses) => {
         if (addresses && addresses.ERC1155LockedETH) {
+          setOriginalLockerContract(addresses.ERC1155LockedETH.address);
+          console.log('ttt1');
           setLockerContract(addresses.ERC1155LockedETH.address);
         }
       });
@@ -77,13 +80,15 @@ export default function ETHToERC1155(
   }
 
   useEffect(() => {
+    setTruthworthy(lockerContract == originalLockerContract);
+
     async function connect() {
       await connectEvents(lockerContract);
     }
 
     connect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lockerContract]);
+  }, [lockerContract, setOriginalLockerContract]);
 
   useEffect(() => {
     // FIXME
@@ -134,7 +139,8 @@ export default function ETHToERC1155(
   // Without this does not load on Chromium, when coming by an external link:
   getAddresses().then((addresses) => {
     if (addresses && addresses.ERC1155LockedETH) { // FIXME: It does not work on mainnet
-      setLockerContract(addresses.ERC1155LockedETH.address);
+      setOriginalLockerContract(addresses.ERC1155LockedETH.address);
+      setLockerContract(addresses.ERC1155LockedETH.address); // FIXME: It reexecutes.
     }
   });
 
@@ -190,7 +196,7 @@ export default function ETHToERC1155(
       <p>ERC-1155 locker contract address:
         {' '}
         <Address value={lockerContract} onChange={(e: ChangeEvent<HTMLInputElement>) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
-        <span ref={truthworthyRef as RefObject<HTMLSpanElement>} style={{display: truthworthy ? 'inline' : 'none'}}>(truthworty)</span>
+        <span ref={truthworthyRef as RefObject<HTMLSpanElement>} style={{display: truthworthy ? 'inline' : 'none'}}> (truthworty)</span>
         <br/>
         <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
       <p>Amount locked in ERC-1155:
