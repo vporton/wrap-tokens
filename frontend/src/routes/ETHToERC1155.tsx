@@ -80,7 +80,7 @@ export default function ETHToERC1155(
   }
 
   useEffect(() => {
-    setTruthworthy(lockerContract == originalLockerContract);
+    setTruthworthy(lockerContract.toLowerCase() === originalLockerContract.toLowerCase());
 
     async function connect() {
       await connectEvents(lockerContract);

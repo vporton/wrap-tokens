@@ -5,7 +5,7 @@ import {
 } from './common';
   
 export function Address({...props}) {
-  const [value, setValue] = useState(props.value);
+  // const [value, setValue] = useState(props.value);
   return (
     <span className="Address">
       <input type="text"
@@ -16,7 +16,7 @@ export function Address({...props}) {
              onChange={props.onChange}
              className={isAddressValid(props.value) ? '' : 'error'}/>
     </span>
-)
+  )
 }
 
 // FIXME: Right support for 256 and 160 bit values.
