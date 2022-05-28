@@ -6,7 +6,7 @@ import {
   
 export function Address({...props}) {
   const inputRef: RefObject<HTMLInputElement> = createRef();
-  const [value, setValue] = useState(props.value);
+  // const [value, setValue] = useState(props.value);
   return (
     <span className="Address">
       <input type="text"
@@ -14,8 +14,8 @@ export function Address({...props}) {
              maxLength={42}
              size={50}
              defaultValue={props.value ? props.value : ""}
-             onChange={(e: ChangeEvent<HTMLInputElement>) => { setValue((inputRef.current as HTMLInputElement).value); props.onChange(e); }}
-             className={isAddressValid(value) ? '' : 'error'}
+             onChange={(e: ChangeEvent<HTMLInputElement>) => props.onChange(e)}
+             className={isAddressValid(props.value) ? '' : 'error'}
              ref={inputRef}/>
     </span>
 )
