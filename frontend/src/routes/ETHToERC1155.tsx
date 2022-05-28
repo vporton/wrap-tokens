@@ -67,7 +67,6 @@ export default function ETHToERC1155(
       await getAddresses().then((addresses) => {
         if (addresses && addresses.ERC1155LockedETH) {
           setOriginalLockerContract(addresses.ERC1155LockedETH.address);
-          console.log('ttt1');
           setLockerContract(addresses.ERC1155LockedETH.address);
         }
       });
@@ -89,13 +88,6 @@ export default function ETHToERC1155(
     connect();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockerContract, setOriginalLockerContract]);
-
-  useEffect(() => {
-    // FIXME
-    getAddresses().then((addresses) => { // ????????????
-      setTruthworthy(addresses && lockerContract.toLowerCase() === addresses.ERC1155LockedETH.address.toLowerCase());
-    });
-  }, [lockerContract]);
 
   async function loadLockedIn1155() {
     // TODO: Don't call functions repeatedly.
@@ -190,15 +182,13 @@ export default function ETHToERC1155(
     }
   }
 
-  const truthworthyRef = createRef();
-
   return (
     <div>
       <p>ERC-1155 token ID: 0</p>
       <p>ERC-1155 locker contract address:
         {' '}
         <Address value={lockerContract} onChange={(e: ChangeEvent<HTMLInputElement>) => setLockerContract((e.target as HTMLInputElement).value as string)}/>
-        <span ref={truthworthyRef as RefObject<HTMLSpanElement>} style={{display: truthworthy ? 'inline' : 'none'}}> (truthworty)</span>
+        <span style={{display: truthworthy ? 'inline' : 'none'}}> (truthworty)</span>
         <br/>
         <span style={{color: 'red'}}>(Be sure to use only trustworthy locker contracts!)</span></p>
       <p>Amount locked in ERC-1155:

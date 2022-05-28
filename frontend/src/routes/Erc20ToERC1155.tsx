@@ -26,6 +26,7 @@ export default function Erc20ToERC1155(
 
   const [erc20Contract, setErc20Contract] = useState('');
   const [erc1155Token, setErc1155Token] = useState('');
+  const [originalLockerContract, setOriginalLockerContract] = useState('');
   const [lockerContract, setLockerContract] = useState('');
   const [wrapperContract, setWrapperContract] = useState('');
   const [erc20Amount, setErc20Amount] = useState('');
@@ -33,6 +34,7 @@ export default function Erc20ToERC1155(
   const [lockedErc1155Amount, setLockedErc1155Amount] = useState('');
   const [amount, setAmount] = useState('');
   const [erc1155WrapperApproved, setErc1155WrapperApproved] = useState(false);
+  const [truthworthy, setTruthworthy] = useState(true);
 
   let myEvents = [null, null, null, null, null];
   
@@ -85,6 +87,7 @@ export default function Erc20ToERC1155(
       // TODO: duplicate code
       await getAddresses().then((addresses) => {
         if (addresses) {
+          setOriginalLockerContract(addresses.ERC1155LockedERC20.address);
           setLockerContract(addresses.ERC1155LockedERC20.address);
           setWrapperContract(addresses.ERC1155OverERC20.address);
         }
@@ -145,6 +148,8 @@ export default function Erc20ToERC1155(
   }, [erc1155Token]);
 
   useEffect(() => {
+    setTruthworthy(lockerContract.toLowerCase() === originalLockerContract.toLowerCase());
+
     async function connect() {
       await connectEvents(erc20Contract, lockerContract, erc1155Token);
     }
@@ -260,13 +265,16 @@ export default function Erc20ToERC1155(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockerContract]);
 
-  // Without this does not load on Chromium, when coming by an external link:
-  getAddresses().then((addresses) => {
-    if (addresses) {
-      setLockerContract(addresses.ERC1155LockedERC20.address);
-      setWrapperContract(addresses.ERC1155OverERC20.address);
-    }
-  });
+  useEffect(() => {
+    // Without this does not load on Chromium, when coming by an external link:
+    getAddresses().then((addresses) => {
+      if (addresses) {
+        setOriginalLockerContract(addresses.ERC1155LockedERC20.address);
+        setLockerContract(addresses.ERC1155LockedERC20.address);
+        setWrapperContract(addresses.ERC1155OverERC20.address);
+      }
+    });
+  }, []);
 
   async function lockErc20inErc1155() {
     if (isAddressValid(lockerContract) && isAddressValid(erc20Contract)) {
@@ -371,6 +379,7 @@ export default function Erc20ToERC1155(
       <p>ERC-1155 locker contract address:
         {' '}
         <Address value={lockerContract} onChange={async (e: Event) => await setLockerContract((e.target as HTMLInputElement).value as string)}/>
+        <span style={{display: truthworthy ? 'inline' : 'none'}}> (truthworty)</span>
         <br/>
         <span style={{color: 'red'}}>
           (Be sure to use only trustworthy locker contracts!)
