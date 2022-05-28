@@ -136,13 +136,15 @@ export default function ETHToERC1155(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lockerContract]);
 
-  // Without this does not load on Chromium, when coming by an external link:
-  getAddresses().then((addresses) => {
-    if (addresses && addresses.ERC1155LockedETH) { // FIXME: It does not work on mainnet
-      setOriginalLockerContract(addresses.ERC1155LockedETH.address);
-      setLockerContract(addresses.ERC1155LockedETH.address); // FIXME: It reexecutes.
-    }
-  });
+  useEffect(() => {
+    // Without this does not load on Chromium, when coming by an external link:
+    getAddresses().then((addresses) => {
+      if (addresses && addresses.ERC1155LockedETH) { // FIXME: It does not work on mainnet
+        setOriginalLockerContract(addresses.ERC1155LockedETH.address);
+        setLockerContract(addresses.ERC1155LockedETH.address); // FIXME: It reexecutes.
+      }
+    });
+  }, []);
 
   async function lockETHinErc1155() {
     if (isAddressValid(lockerContract)) {
