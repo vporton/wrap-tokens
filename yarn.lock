@@ -1198,10 +1198,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@symfoni/hardhat-react@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@symfoni/hardhat-react/-/hardhat-react-0.1.6.tgz#c009c9c51a7b91b7ebf0bf5c8d9f74ee9907b79b"
-  integrity sha512-ns/ZDPGNu72UcMpVTpFN8zalS/d+cuhR+0NRfeARGyZDNGAzS7A7EOIlgxOX4D5qCdM0RwTjYLnizURZ+3g3Lw==
+"@symfoni/hardhat-react@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@symfoni/hardhat-react/-/hardhat-react-0.3.0.tgz#af12cb0a4ef6de6c8623ffb21ee3ce80ca240a9c"
+  integrity sha512-P5/Qs0GFqdQWXv6flLx8WZRs1UtY0XIjWb11PXwv6wa6EjJR9WZGcUm2iCw/H8kIpFcE+NaFj/rNTpNQQxwS1A==
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
