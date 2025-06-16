@@ -15,12 +15,12 @@
     "@symfoni/hardhat-react": "^0.1.6",
     "chai-bignumber": "^3.0.0",
     "eslint": "^7.11.0",
-    "hardhat": "^2.9.6",
-    "hardhat-deploy": "^0.7.0-beta.38",
+    "hardhat": "^2.22.16",
+    "hardhat-deploy": "^1.0.3",
     "hardhat-deploy-ethers": "^0.3.0-beta.7",
     "hardhat-typechain": "^0.3.3",
-    "ts-morph": "^9.0.0",
-    "typechain": "^4.0.0",
+    "ts-morph": "^10.0.2",
+    "typechain": "^5.0.0",
     "typechain-target-ethers-v5": "^1.2.2"
   },
   "devDependencies": {
